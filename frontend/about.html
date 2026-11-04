@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="About ABESS, a web-based equation-solving toolbox developed as a diploma thesis at the Hellenic Mediterranean University.">
+  <title>About ABESS | Equation Solver</title>
+  <link rel="stylesheet" href="./assets/css/style.css?v=about-20261017">
+  <style>
+    /* About-only styles; the site's original stylesheet provides the palette and shell. */
+    .about-shell { max-width: 1190px; }
+    .about-topbar { align-items: flex-start; gap: 18px; margin-bottom: 12px; }
+    .about-topbar .subtitle { margin-bottom: 0; }
+    .about-back {
+      display: inline-flex; justify-content: center; align-items: center;
+      min-height: 42px; padding: 10px 15px; border: 1px solid var(--border-strong);
+      border-radius: 10px; background: var(--surface); color: var(--primary-dark);
+      font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap;
+    }
+    .about-back:hover { background: var(--primary-soft); }
+    .about-back:focus-visible, .about-section-links a:focus-visible,
+    .about-card a:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+    .about-intro {
+      background: linear-gradient(125deg, var(--surface-blue), var(--surface));
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 23px 25px; margin: 19px 0 16px;
+    }
+    .about-kicker { color: var(--primary-dark); font-size: 13px; letter-spacing: .045em; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
+    .about-intro h2 { color: var(--text-strong); font-size: clamp(1.35rem, 2.6vw, 1.85rem); line-height: 1.35; margin: 0 0 9px; }
+    .about-intro p { color: var(--text-muted); line-height: 1.75; max-width: 900px; }
+    .about-section-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; }
+    .about-section-links a { color: var(--primary-dark); background: var(--surface-soft); border: 1px solid var(--border); border-radius: 9px; padding: 8px 12px; text-decoration: none; font-size: 13px; font-weight: 700; }
+    .about-section-links a:hover { background: var(--primary-soft); }
+    .about-layout { display: grid; gap: 18px; }
+    .about-card { background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 22px 24px; min-width: 0; }
+    .about-card h2 { font-size: 1.22rem; line-height: 1.4; color: var(--text-strong); margin: 0 0 13px; }
+    .about-card h3 { color: var(--text-strong); font-size: 1rem; margin: 0 0 6px; }
+    .about-card p { line-height: 1.7; margin-bottom: 11px; }
+    .about-card p:last-child { margin-bottom: 0; }
+    .about-card a { color: var(--primary-dark); overflow-wrap: anywhere; }
+    .about-modes { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px; margin: 17px 0; }
+    .about-mode { background: var(--surface-soft); padding: 17px; border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 12px; }
+    .about-mode p { font-size: 14px; margin: 0; }
+    .about-features { margin: 8px 0 0; padding-left: 20px; line-height: 1.7; }
+    .about-features li { margin: 5px 0; }
+    .about-workflow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 17px 0 14px; }
+    .about-step { background: var(--surface-soft); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; font-weight: 600; font-size: 14px; }
+    .about-arrow { color: var(--primary); font-size: 20px; }
+    .about-team { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 14px 0; }
+    .about-person { background: var(--surface-soft); border: 1px solid var(--border); border-radius: 11px; padding: 15px 17px; }
+    .about-person strong { display: block; margin-bottom: 4px; color: var(--text-strong); }
+    .about-person span { color: var(--text-muted); font-size: 14px; }
+    .about-tech-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 0; }
+    .about-tech-list span { display: inline-block; border: 1px solid var(--border); background: var(--surface-soft); color: var(--text); border-radius: 8px; padding: 7px 11px; font-size: 13px; font-weight: 700; }
+
+    /* ABESS_ABOUT_REFINED_V2: keep uppercase AI on the ordinary text baseline. */
+    .about-ref-heading { margin: 19px 0 10px; }
+    .about-ref-heading:first-of-type { margin-top: 15px; }
+    .about-references { list-style: none; padding: 0; margin: 8px 0 0; }
+    .about-references li { padding-left: 1.8em; text-indent: -1.8em; line-height: 1.68; overflow-wrap: anywhere; margin: 0 0 15px; }
+    .about-references li:last-child { margin-bottom: 0; }
+    .about-powered { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+    .about-powered-logo { width: min(100%, 340px); height: auto; display: block; }
+    .about-powered-text { flex: 1 1 290px; }
+    .about-contact { display: grid; grid-template-columns: minmax(100px,150px) 1fr; gap: 8px 16px; }
+    .about-contact dt { color: var(--text-muted); }
+    .about-contact dd { margin: 0; overflow-wrap: anywhere; }
+    .about-foot { margin-top: 22px; padding-top: 17px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 13px; text-align: center; line-height: 1.7; }
+    @media(max-width: 750px) {
+      .about-modes,.about-team { grid-template-columns: 1fr; }
+      .about-card { padding: 19px 18px; }
+      .about-topbar { flex-wrap: wrap; }
+      .about-powered { align-items: flex-start; }
+    }
+    @media(max-width: 480px) {
+      .about-intro { padding: 19px 17px; }
+      .about-arrow { display: none; }
+      .about-workflow { display: grid; }
+      .about-contact { grid-template-columns: 1fr; gap: 3px; }
+      .about-contact dd { margin-bottom: 8px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <main class="solver-card about-shell">
+    <div class="top-bar about-topbar">
+      <div>
+        <h1>About ABESS</h1>
+        <p class="subtitle">The application, its scientific foundations and the people behind it.</p>
+      </div>
+      <a class="about-back" href="./index.html">← Back to Solver</a>
+    </div>
+
+    <section class="about-intro" aria-labelledby="about-intro-title">
+      <p class="about-kicker">Academic thesis project · Hellenic Mediterranean University</p>
+      <h2 id="about-intro-title">An equation-solving toolbox, with method choice in your hands.</h2>
+      <p>ABESS is a web application for solving equations in one unknown. Users can select a supported method directly or request an automatic recommendation through rAIson, based on the available characteristics of the problem and their preferences.</p>
+    </section>
+
+    <nav class="about-section-links" aria-label="About page sections">
+      <a href="#capabilities">Capabilities</a><a href="#workflow">How it works</a>
+      <a href="#technologies">Technologies</a><a href="#thesis">The thesis</a>
+      <a href="#research">Scientific foundations</a><a href="#references">Publications</a>
+      <a href="#powered">rAIson</a><a href="#contact">Contact</a>
+    </nav>
+
+    <div class="about-layout">
+      <section id="capabilities" class="about-card" aria-labelledby="about-capabilities-title">
+        <h2 id="about-capabilities-title">What can ABESS do?</h2>
+        <div class="about-modes">
+          <div class="about-mode"><h3>Manual method selection</h3>
+            <p>Choose from nine supported methods: Bisection, Newton–Raphson, Secant, fzero, ITP, Muller, Symbolic Solve, Polynomial Roots and Integer Exhaustive Scan. For numerical methods, users may enter their own starting values or let ABESS attempt to estimate them automatically.</p>
+          </div>
+          <div class="about-mode"><h3>Automatic / rAIson</h3>
+            <p>Provide relevant criteria about the equation and the desired solution. rAIson recommends a method; the ABESS backend then performs the calculation.</p>
+          </div>
+        </div>
+        <p>The application also includes:</p>
+        <ul class="about-features">
+          <li>Interactive function graphs with pan, zoom and interval-point selection.</li>
+          <li>Numerical and, where supported, symbolic solutions.</li>
+          <li>Personal solve history for registered users and up to three guest solves.</li>
+          <li>REST API access for programmatic equation solving.</li>
+        </ul>
+      </section>
+
+      <section id="workflow" class="about-card" aria-labelledby="about-workflow-title">
+        <h2 id="about-workflow-title">How it works</h2>
+        <p>ABESS separates the choice of method from the mathematical computation. In <strong>Automatic</strong> mode, it uses the external rAIson service to recommend a method; a Python backend evaluates the equation using the implemented numerical or symbolic routines. In <strong>Manual</strong> mode, the user selects the method without requesting a recommendation.</p>
+        <div class="about-workflow" aria-label="Automatic mode workflow">
+          <span class="about-step">Equation and criteria</span><span class="about-arrow" aria-hidden="true">→</span>
+          <span class="about-step">rAIson recommends a method</span><span class="about-arrow" aria-hidden="true">→</span>
+          <span class="about-step">Python backend solves</span><span class="about-arrow" aria-hidden="true">→</span>
+          <span class="about-step">Method and result</span>
+        </div>
+        <p>For supported input notation, method parameters, criteria and API usage, visit the <a href="./index.html">Equation Solver</a> and open its <strong>Help</strong> panel.</p>
+      </section>
+      <section id="technologies" class="about-card" aria-labelledby="about-tech-title">
+        <h2 id="about-tech-title">Implementation &amp; technologies</h2>
+        <p>The web application uses a Python backend built with FastAPI. SciPy and SymPy support numerical and symbolic mathematics, while SQLite and SQLAlchemy support application data. The browser interface uses HTML, CSS, JavaScript and Plotly; Docker Compose and Caddy are part of the deployment stack. Automatic method selection communicates with rAIson through its external service/API.</p>
+        <div class="about-tech-list" aria-label="Technologies used">
+          <span>Python</span><span>FastAPI</span><span>SciPy</span><span>SymPy</span>
+          <span>SQLite</span><span>SQLAlchemy</span><span>HTML / CSS / JavaScript</span>
+          <span>Plotly</span><span>Docker Compose</span><span>Caddy</span><span>rAIson API</span>
+        </div>
+      </section>
+
+      <section id="thesis" class="about-card" aria-labelledby="about-thesis-title">
+        <h2 id="about-thesis-title">Academic project &amp; thesis</h2>
+        <p>The ABESS web application was designed and implemented as the diploma thesis of <strong>Vasileios Tsiotas</strong> at the <strong>Department of Electronic Engineering, Hellenic Mediterranean University</strong>, under the supervision of <strong>Assistant Professor Nikolaos Spanoudakis</strong>. It implements a web-based equation-solving system drawing on the cited research, while integrating the external rAIson platform for automatic method recommendations.</p>
+        <div class="about-team">
+          <div class="about-person"><strong>Vasileios Tsiotas</strong><span>Diploma thesis · web application design and implementation</span></div>
+          <div class="about-person"><strong>Nikolaos Spanoudakis</strong><span>Assistant Professor · academic supervisor</span></div>
+        </div>
+        <p><strong>Thesis publication:</strong> A public link can be added here once the thesis is finalized and made available. No thesis DOI or publication is claimed at present.</p>
+      </section>
+
+      <section id="research" class="about-card" aria-labelledby="about-research-title">
+        <h2 id="about-research-title">Scientific foundations</h2>
+        <p>ABESS is a diploma-thesis software project built on previously published research concerning numerical root-finding and argumentation-based method selection.</p>
+        <p>The publications below provide the scientific foundations, including computational argumentation for automatic recommendations. These theoretical contributions belong to their respective authors.</p>
+        <p>The contribution of this diploma thesis is the design and implementation of the ABESS web application: manual method selection, recommendations through the external rAIson API, numerical and symbolic equation solving, interactive graphs and supporting application services.</p>
+        <p>The Network Connectivity, Wireless Sensor Network Coverage and RF Energy Harvesting examples in Help use numerical adaptations of models presented by Mandikas, Liodakis and Spanoudakis (2026).</p>
+      </section>
+
+      <section id="references" class="about-card" aria-labelledby="about-references-title">
+        <h2 id="about-references-title">Scientific publications &amp; references</h2>
+        <p>Published sources supporting the mathematical and argumentation-based approach, followed by publications for the scientific software used in ABESS. All links refer to the original publications; the diploma thesis will be added when it is publicly available.</p>
+        <h3 class="about-ref-heading">Root-finding &amp; method-selection research</h3>
+        <ol class="about-references">
+          <li>Mandikas, V., Liodakis, G. S., &amp; Spanoudakis, N. (2026). Argumentation-based equation-solver selector for energy-efficient WSNs. <em>Algorithms, 19</em>(6), Article 457. <a href="https://doi.org/10.3390/a19060457" target="_blank" rel="noopener noreferrer">https://doi.org/10.3390/a19060457</a></li>
+          <li>Mandikas, V., &amp; Spanoudakis, N. (2025). An effective root-finding toolbox using computational argumentation. In <em>2025 6th International Conference in Electronic Engineering, Information Technology &amp; Education (EEITE)</em>. <a href="https://doi.org/10.1109/EEITE65381.2025.11166218" target="_blank" rel="noopener noreferrer">https://doi.org/10.1109/EEITE65381.2025.11166218</a></li>
+          <li>Moraitis, P., Spanoudakis, N., &amp; Kakas, A. (2026). rAIson: Developing reliable decision-making agents. In <em>Proceedings of the 25th International Conference on Autonomous Agents and Multiagent Systems</em> (pp. 4128–4130). IFAAMAS. <a href="https://doi.org/10.65109/CYPN9399" target="_blank" rel="noopener noreferrer">https://doi.org/10.65109/CYPN9399</a></li>
+        </ol>
+        <h3 class="about-ref-heading">Scientific software: SciPy &amp; SymPy</h3>
+        <ol class="about-references">
+          <li>Virtanen, P., Gommers, R., Oliphant, T. E., Haberland, M., Reddy, T., Cournapeau, D., … van Mulbregt, P. (2020). SciPy 1.0: Fundamental algorithms for scientific computing in Python. <em>Nature Methods, 17</em>(3), 261–272. <a href="https://doi.org/10.1038/s41592-019-0686-2" target="_blank" rel="noopener noreferrer">https://doi.org/10.1038/s41592-019-0686-2</a></li>
+          <li>Meurer, A., Smith, C. P., Paprocki, M., Čertík, O., Kirpichev, S. B., Rocklin, M., … Scopatz, A. (2017). SymPy: Symbolic computing in Python. <em>PeerJ Computer Science, 3</em>, e103. <a href="https://doi.org/10.7717/peerj-cs.103" target="_blank" rel="noopener noreferrer">https://doi.org/10.7717/peerj-cs.103</a> · <a href="https://peerj.com/articles/cs-103.pdf" target="_blank" rel="noopener noreferrer" aria-label="Open SymPy publication PDF">View PDF ↗</a></li>
+        </ol>
+      </section>
+
+      <section id="powered" class="about-card" aria-labelledby="about-powered-title">
+        <h2 id="about-powered-title">Powered by rAIson</h2>
+        <div class="about-powered">
+          <img class="about-powered-logo" src="./assets/img/raison-logo.png" alt="rAIson by Argument Theory" width="2048" height="590">
+          <div class="about-powered-text">
+            <p>Automatic method recommendations are powered by <strong>rAIson</strong>, the computational-argumentation decision platform from <a href="https://www.argument-theory.com/" target="_blank" rel="noopener noreferrer">Argument Theory ↗</a>. The recommendation service is external to the ABESS Python equation-solving backend.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="about-card" aria-labelledby="about-contact-title">
+        <h2 id="about-contact-title">Contact</h2>
+        <p>For academic questions, feedback or bug reports:</p>
+        <dl class="about-contact">
+          <dt>Contact</dt><dd>Assistant Professor Nikolaos Spanoudakis</dd>
+          <dt>Email</dt><dd><a href="mailto:nspan@hmu.gr">nspan@hmu.gr</a></dd>
+          <dt>Telephone</dt><dd><a href="tel:+302821123086">+30 2821 123086</a></dd>
+          <dt>Institution</dt><dd>Department of Electronic Engineering, Hellenic Mediterranean University</dd>
+        </dl>
+      </section>
+    </div>
+    <footer class="about-foot">Last updated: October 2026 · Department of Electronic Engineering · Hellenic Mediterranean University<br><a href="./index.html">Return to Equation Solver</a></footer>
+  </main>
+</div>
+</body>
+</html>

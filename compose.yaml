@@ -1,0 +1,25 @@
+name: abess-local
+
+services:
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - .env
+    volumes:
+      - app_data:/data
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "127.0.0.1:8080:80"
+    restart: unless-stopped
+
+volumes:
+  app_data:

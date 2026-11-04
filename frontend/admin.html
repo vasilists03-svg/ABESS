@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Dashboard - Equation Solver</title>
+
+    <link
+        rel="stylesheet"
+        href="./assets/css/admin.css?v=1"
+    >
+
+    <style>
+        .admin-method-summary { padding: 0 24px 22px; margin: 0; }
+        .admin-summary-metrics {
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px; margin: 0;
+        }
+        .admin-summary-metric {
+            padding: 15px 18px; border: 1px solid #e2e8f0;
+            border-radius: 12px; background: #f8fafc;
+        }
+        .admin-summary-metric dt { font-size: 12px; font-weight: 600; color: #526176; line-height: 1.5; }
+        .admin-summary-metric dd {
+            margin: 5px 0 0; font-size: 26px; font-weight: 700;
+            line-height: 1.2; color: #15243b; font-variant-numeric: tabular-nums;
+        }
+        .admin-summary-metric--success { background: #f2fbf6; border-color: #d8eee1; }
+        .admin-summary-metric--success dd { color: #187447; }
+        .admin-summary-metric--failed { background: #fff6f5; border-color: #f3dedb; }
+        .admin-summary-metric--failed dd { color: #b43e37; }
+        .admin-method-summary .admin-summary-caption {
+            margin: 12px 0 0; color: #64748b; font-size: 12px; line-height: 1.7;
+        }
+        .admin-summary-details { margin-top: 10px; color: #64748b; font-size: 12px; line-height: 1.7; }
+        .admin-summary-details summary { cursor: pointer; width: fit-content; color: #475569; font-weight: 600; }
+        .admin-summary-details summary:hover { color: #1d4ed8; }
+        .admin-summary-details summary:focus-visible { outline: 2px solid #2563eb; outline-offset: 4px; border-radius: 3px; }
+        .admin-summary-details p { margin: 8px 0 0; max-width: 78ch; }
+        @media (max-width: 540px) {
+            .admin-method-summary { padding: 0 16px 18px; }
+            .admin-summary-metrics { gap: 8px; }
+            .admin-summary-metric { padding: 12px 10px; border-radius: 10px; }
+            .admin-summary-metric dd { font-size: 22px; }
+            .admin-summary-metric dt { font-size: 11px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="admin-page">
+
+    <header class="admin-header">
+
+        <div>
+            <h1>Admin Dashboard</h1>
+
+            <p class="admin-subtitle">
+                Equation Solver Administration
+            </p>
+        </div>
+
+        <div class="admin-header-actions">
+
+            <span id="adminUserEmail" class="admin-user-email">
+                Admin
+            </span>
+
+            <button
+                type="button"
+                id="backToSolverButton"
+                class="btn-secondary"
+            >
+                Back to Solver
+            </button>
+
+            <button
+                type="button"
+                id="adminHelpButton"
+                class="btn-secondary"
+            >
+                Manual
+            </button>
+
+            <button
+                type="button"
+                id="adminLogoutButton"
+                class="btn-danger"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <div
+        id="adminMessage"
+        class="admin-message hidden"
+    ></div>
+
+
+    <section
+        id="adminLoading"
+        class="admin-loading"
+    >
+        Loading admin data...
+    </section>
+
+
+    <section
+        id="adminContent"
+        class="admin-content hidden"
+    >
+
+        <!-- ============================== -->
+        <!-- SUMMARY STATISTICS -->
+        <!-- ============================== -->
+
+        <section class="admin-section">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Overview</h2>
+
+                    <p>
+                        Summary of application usage and system activity.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    id="refreshAdminButton"
+                    class="btn-secondary"
+                >
+                    Refresh
+                </button>
+            </div>
+
+
+            <div class="stats-grid">
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        Registered Users
+                    </span>
+
+                    <strong
+                        id="statTotalUsers"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        Total Attempts
+                    </span>
+
+                    <strong
+                        id="statTotalAttempts"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        Successful
+                    </span>
+
+                    <strong
+                        id="statSuccessfulAttempts"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        Failed
+                    </span>
+
+                    <strong
+                        id="statFailedAttempts"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        Manual Requests
+                    </span>
+
+                    <strong
+                        id="statManualAttempts"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        Automatic Requests
+                    </span>
+
+                    <strong
+                        id="statRaisonAttempts"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        Web Requests
+                    </span>
+
+                    <strong
+                        id="statWebRequests"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        API Requests
+                    </span>
+
+                    <strong
+                        id="statApiRequests"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        Guest Users
+                    </span>
+
+                    <strong
+                        id="statGuestRecords"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        Guest Attempts
+                    </span>
+
+                    <strong
+                        id="statGuestAttempts"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+
+                <article class="stat-card">
+                    <span class="stat-label">
+                        Verified Users
+                    </span>
+
+                    <strong
+                        id="statVerifiedUsers"
+                        class="stat-value"
+                    >
+                        0
+                    </strong>
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- ============================== -->
+        <!-- METHOD USAGE -->
+        <!-- ============================== -->
+
+        <section class="admin-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>Method Usage</h2>
+
+                    <p>
+                        Solving attempts and outcomes for each supported method,
+                        including methods selected by rAIson.
+                    </p>
+                </div>
+
+            </div>
+
+            <div id="methodUsageSummary" class="admin-method-summary" aria-live="polite">
+                Loading statistics...
+            </div>
+
+            <div class="table-wrapper">
+
+                <table class="admin-table">
+
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Attempts</th>
+                            <th>Successful</th>
+                            <th>Failed</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="methodUsageTableBody">
+
+                        <tr>
+                            <td colspan="4">
+                                No method statistics loaded.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- ============================== -->
+        <!-- RAISON METHOD SELECTION -->
+        <!-- ============================== -->
+
+        <section class="admin-section">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Raison method selection</h2>
+
+                    <p>
+                        Successful means a supported method was selected.
+                        Solving outcomes are counted separately in Method Usage.
+                    </p>
+                </div>
+            </div>
+
+            <div id="raisonSelectionSummary" class="admin-method-summary" aria-live="polite">
+                Loading statistics...
+            </div>
+
+            <div class="table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Attempts</th>
+                            <th>Successful</th>
+                            <th>Failed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="raisonMethodSelectionTableBody">
+                        <tr>
+                            <td colspan="4">
+                                No rAIson selection statistics loaded.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+
+        <!-- ============================== -->
+        <!-- NAVIGATION TABS -->
+        <!-- ============================== -->
+
+        <section class="admin-section">
+
+            <div class="admin-tabs">
+
+                <button
+                    type="button"
+                    class="admin-tab active"
+                    data-tab="users"
+                >
+                    Users
+                </button>
+
+                <button
+                    type="button"
+                    class="admin-tab"
+                    data-tab="history"
+                >
+                    Solve History
+                </button>
+
+                <button
+                    type="button"
+                    class="admin-tab"
+                    data-tab="guests"
+                >
+                    Guests
+                </button>
+
+            </div>
+
+
+            <!-- ========================== -->
+            <!-- USERS -->
+            <!-- ========================== -->
+
+            <div
+                id="usersTab"
+                class="tab-panel"
+            >
+
+                <div class="table-heading">
+                    <div>
+                        <h2>Registered Users</h2>
+
+                        <p>
+                            User accounts registered in the application.
+                        </p>
+                    </div>
+
+                    <span
+                        id="usersCount"
+                        class="record-count"
+                    >
+                        0 records
+                    </span>
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="admin-table">
+
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Verified</th>
+                                <th>Active</th>
+                                <th>Created</th>
+                                <th>History</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="usersTableBody">
+
+                            <tr>
+                                <td colspan="7">
+                                    No users loaded.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ========================== -->
+            <!-- HISTORY -->
+            <!-- ========================== -->
+
+            <div
+                id="historyTab"
+                class="tab-panel hidden"
+            >
+
+                <div class="table-heading">
+
+                    <div>
+                        <h2>Solve History</h2>
+
+                        <p>
+                            Detailed record of successful and failed
+                            equation-solving attempts, including method
+                            selection, request origin and rAIson information.
+                        </p>
+                    </div>
+
+                    <div class="admin-header-actions">
+
+                        <span
+                            id="historyFilterStatus"
+                            class="record-count"
+                        >
+                            Showing all users
+                        </span>
+
+                        <button
+                            type="button"
+                            id="clearHistoryFilterButton"
+                            class="btn-secondary hidden"
+                        >
+                            Show All Users
+                        </button>
+
+                        <span
+                            id="historyCount"
+                            class="record-count"
+                        >
+                            0 records
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="admin-table">
+
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Equation</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Result / Error</th>
+                                <th>Selection</th>
+                                <th>Request</th>
+                                <th>Iterations</th>
+                                <th>rAIson Suggested</th>
+                                <th>rAIson Explanation</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="historyTableBody">
+
+                            <tr>
+                                <td colspan="12">
+                                    No history loaded.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ========================== -->
+            <!-- GUESTS -->
+            <!-- ========================== -->
+
+            <div
+                id="guestsTab"
+                class="tab-panel hidden"
+            >
+
+                <div class="table-heading">
+
+                    <div>
+                        <h2>Guest Usage</h2>
+
+                        <p>
+                            Application usage without a registered account.
+                        </p>
+                    </div>
+
+                    <span
+                        id="guestsCount"
+                        class="record-count"
+                    >
+                        0 records
+                    </span>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="admin-table">
+
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Guest ID</th>
+                                <th>Attempts</th>
+                                <th>Created</th>
+                                <th>Last Used</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="guestsTableBody">
+
+                            <tr>
+                                <td colspan="5">
+                                    No guest usage loaded.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </section>
+
+</main>
+
+
+<script src="./assets/js/admin.js?v=6"></script>
+
+</body>
+</html>

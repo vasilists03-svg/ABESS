@@ -1,0 +1,3225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Administrator Manual - Equation Solver</title>
+
+    <link
+        rel="stylesheet"
+        href="./assets/css/admin.css?v=1"
+    >
+
+    <style>
+        .help-content {
+            display: grid;
+            gap: 22px;
+        }
+
+        .help-section {
+            background: #ffffff;
+            border: 1px solid #dbe3ef;
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        .help-section h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .help-section h3 {
+            margin-top: 22px;
+            margin-bottom: 8px;
+        }
+
+        .help-section p {
+            line-height: 1.6;
+        }
+
+        .help-section ul {
+            line-height: 1.7;
+            padding-left: 22px;
+        }
+
+        .help-code {
+            position: relative;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            padding: 16px;
+            overflow-x: auto;
+            border-radius: 10px;
+            background: #111827;
+            color: #f9fafb;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .help-warning {
+            padding: 14px 16px;
+            margin: 14px 0;
+            border-left: 5px solid #dc2626;
+            border-radius: 8px;
+            background: #fef2f2;
+        }
+
+        .help-info {
+            padding: 14px 16px;
+            margin: 14px 0;
+            border-left: 5px solid #2563eb;
+            border-radius: 8px;
+            background: #eff6ff;
+        }
+
+        .help-success {
+            padding: 14px 16px;
+            margin: 14px 0;
+            border-left: 5px solid #059669;
+            border-radius: 8px;
+            background: #ecfdf5;
+        }
+
+        .help-loading {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .help-footer {
+            margin-top: 25px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .help-table-wrapper {
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .help-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .help-table th,
+        .help-table td {
+            padding: 10px 12px;
+            border: 1px solid #dbe3ef;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .help-table th {
+            background: #f8fafc;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 700px) {
+            .help-section {
+                padding: 16px;
+            }
+
+            .admin-header-actions {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="admin-page">
+
+    <header class="admin-header">
+
+        <div>
+            <h1>Administrator Manual</h1>
+
+            <p class="admin-subtitle">
+                Equation Solver Operations & Maintenance Guide
+            </p>
+        </div>
+
+        <div class="admin-header-actions">
+
+            <span
+                id="helpAdminEmail"
+                class="admin-user-email"
+            >
+                Admin
+            </span>
+
+            <button
+                type="button"
+                id="backToDashboardButton"
+                class="btn-secondary"
+            >
+                Back to Dashboard
+            </button>
+
+            <button
+                type="button"
+                id="helpLogoutButton"
+                class="btn-danger"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <section
+        id="helpLoading"
+        class="help-loading"
+    >
+        Verifying administrator access...
+    </section>
+
+
+    <section
+        id="helpAccessError"
+        class="admin-message error hidden"
+    >
+        Administrator access is required.
+    </section>
+
+
+    <section
+        id="helpContent"
+        class="help-content hidden"
+    >
+
+        <!-- ===================================== -->
+
+        <!-- ADMIN_APPLICATION_MANUAL_V1 -->
+
+        <!-- ===================================== -->
+        <!-- APPLICATION OVERVIEW -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>1. Application Overview and Architecture</h2>
+
+            <p>
+                ABESS is a web application for solving scalar mathematical
+                equations and selecting an appropriate solving method either
+                manually or through the rAIson decision service.
+            </p>
+
+            <div class="help-table-wrapper">
+
+                <table class="help-table">
+
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Browser frontend</td>
+                            <td>
+                                Provides authentication, solver controls,
+                                graphing, History, My Information and
+                                administrator interfaces.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>FastAPI backend</td>
+                            <td>
+                                Handles authentication, API requests,
+                                equation validation, method execution,
+                                rAIson communication and persistence.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Uvicorn</td>
+                            <td>
+                                Runs the FastAPI application as the
+                                production ASGI server inside the backend
+                                container.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>SQLite / SQLAlchemy</td>
+                            <td>
+                                Stores users, guest usage and solve-history
+                                information.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>nginx</td>
+                            <td>
+                                Serves the static production frontend.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Caddy</td>
+                            <td>
+                                Acts as the public reverse proxy and HTTPS
+                                entry point for the production domain.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>rAIson</td>
+                            <td>
+                                External decision service used by the
+                                Automatic mode to recommend a supported
+                                solving method and provide an explanation.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="help-info">
+                rAIson selects or recommends the method.
+                The actual mathematical computation is performed
+                by the Python backend.
+            </div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- SOLVER -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+    <h2>2. Administrator Scope and Application Boundaries</h2>
+
+    <p>
+        This manual is an operations, maintenance, security and
+        recovery reference for ABESS administrators.
+        It is intentionally separate from the normal User Help.
+    </p>
+
+    <div class="help-info">
+        User-facing method explanations, required numerical inputs,
+        mathematical notation, supported-function examples,
+        rAIson criterion descriptions and equation examples are
+        maintained in the User Help and are not duplicated here.
+    </div>
+
+    <p>
+        From an administrator's perspective, the production solver
+        consists of a browser frontend, nginx, a FastAPI/Uvicorn
+        backend, SQLite persistence, the external rAIson decision
+        service and Caddy as the public HTTPS reverse proxy.
+    </p>
+
+    <p>
+        The current production application exposes nine supported
+        solving methods. The authoritative user-facing list is kept
+        in the User Help, while implementation and normalization are
+        maintained in
+        <code>app/services/equation_solver.py</code> and
+        <code>app/routers/equation.py</code>.
+    </p>
+
+    <div class="help-warning">
+        <code>brentq</code> and <code>fsolve</code> are not public
+        methods of the final production application.
+        Older development or historical database records may still
+        contain legacy names and must not be interpreted as current
+        public functionality.
+    </div>
+
+</section>
+
+
+<section class="help-section">
+
+    <h2>3. rAIson Integration Administration</h2>
+
+    <p>
+        rAIson is used for method recommendation in Automatic mode.
+        It does not perform the final mathematical computation.
+        After a supported recommendation has been received and
+        normalized, execution is performed by the ABESS Python
+        backend.
+    </p>
+
+    <p>
+        The backend accepts the public ABESS criterion identifiers,
+        converts them to the corresponding rAIson elements internally
+        and normalizes supported rAIson method names to ABESS solver
+        identifiers.
+    </p>
+
+    <div class="help-info">
+        <code>no_context</code> is internal application state.
+        It must not be supplied by an external API caller or exposed
+        as a selectable user option.
+    </div>
+
+    <h3>Relevant configuration</h3>
+
+    <div class="help-code">RAISON_APP_ID
+RAISON_VERSION
+RAISON_API_KEY
+RAISON_TIMEOUT_SECONDS
+RAISON_METADATA_CACHE_SECONDS</div>
+
+    <p>
+        Never display the value of
+        <code>RAISON_API_KEY</code> in logs, documentation,
+        screenshots or support messages.
+    </p>
+
+    <h3>When Automatic / rAIson fails</h3>
+
+    <ol>
+        <li>Check backend health.</li>
+        <li>Inspect backend logs.</li>
+        <li>
+            Confirm that the required rAIson environment-variable
+            names exist without printing their secret values.
+        </li>
+        <li>
+            Check whether the external rAIson service is reachable.
+        </li>
+        <li>
+            Inspect the stored selection source, recommendation and
+            explanation in Solve History.
+        </li>
+        <li>
+            Confirm that a returned recommendation was normalized to
+            a currently supported production method.
+        </li>
+    </ol>
+
+</section>
+
+
+<section class="help-section">
+
+    <h2>4. Accounts, Roles and Administrator Authorization</h2>
+
+    <p>
+        Protected registered-user and administrator functionality is
+        authenticated with JWT access tokens.
+    </p>
+
+    <h3>Administrator authorization rule</h3>
+
+    <p>
+        The backend grants administrator access only after all
+        applicable authentication checks pass.
+    </p>
+
+    <ol>
+        <li>The JWT must be present and valid.</li>
+        <li>The referenced user must exist.</li>
+        <li>The account must be active.</li>
+        <li>The account must be email-verified.</li>
+        <li>
+            The account must either have
+            <code>role = "admin"</code> or its email address must
+            match the configured <code>ADMIN_EMAIL</code>.
+        </li>
+    </ol>
+
+    <p>
+        Failure before authentication normally produces HTTP 401.
+        An authenticated account that does not satisfy administrator
+        requirements normally receives HTTP 403.
+    </p>
+
+    <h3>Guest access</h3>
+
+    <p>
+        Guest usage is stored separately from registered-user data.
+        The configured guest limit is enforced by the application and
+        should be inspected through configuration and the Guests view
+        rather than changed directly in production data.
+    </p>
+
+    <h3>Password recovery and email verification</h3>
+
+    <p>
+        Verification and password-reset operations depend on the
+        production mail configuration. Password-reset tokens are
+        handled separately from normal JWT access tokens.
+    </p>
+
+</section>
+
+
+<section class="help-section">
+
+    <h2>5. API Keys, Request Sources and Audit Information</h2>
+
+    <p>
+        Registered users can have a personal API key for direct API
+        access. API authentication uses the
+        <code>X-API-Key</code> request header.
+    </p>
+
+    <div class="help-warning">
+        Never display, log, publish or copy a real personal API key
+        into documentation. Regenerating a user's key invalidates the
+        previous key.
+    </div>
+
+    <h3>Request source</h3>
+
+    <p>
+        <strong>WEB</strong> identifies requests originating from the
+        normal browser application.
+        <strong>API</strong> identifies requests authenticated through
+        a registered user's personal API key.
+    </p>
+
+    <h3>Selection source</h3>
+
+    <p>
+        The request source and the method-selection source are
+        different fields. A request can originate from WEB or API and
+        can independently use Manual or rAIson method selection.
+    </p>
+
+    <p>
+        These fields are stored separately so an administrator can
+        diagnose how a request entered the system and how its solver
+        method was selected.
+    </p>
+
+</section>
+
+
+<section class="help-section">
+
+    <h2>6. Protected Administrator Interfaces</h2>
+
+    <h3>Admin Dashboard</h3>
+
+    <p>
+        The Admin Dashboard is protected by backend administrator
+        authorization and is intended for application monitoring,
+        usage inspection and review of stored operational data.
+    </p>
+
+    <h3>Administrator Manual security model</h3>
+
+    <p>
+        The full operations manual is not stored in the public
+        frontend page. The current architecture is:
+    </p>
+
+    <div class="help-code">Public loader:
+frontend/admin-help.html
+
+Protected manual body:
+app/manual/admin_manual.html
+
+Protected backend endpoint:
+GET /admin/manual-content
+
+Public route through nginx:
+GET /api/admin/manual-content</div>
+
+    <p>
+        The protected endpoint uses
+        <code>get_current_admin</code>. The response is returned with
+        <code>Cache-Control: no-store, private</code>.
+    </p>
+
+    <p>
+        The Manual button is displayed in the normal frontend only
+        after the frontend verifies administrator status through the
+        backend.
+    </p>
+
+    <h3>Expected security behavior</h3>
+
+    <div class="help-code">No authentication:
+GET /api/admin/manual-content
+Expected: HTTP 401
+
+Authenticated non-admin:
+Expected: HTTP 403
+
+Authenticated administrator:
+Expected: HTTP 200
+
+Frontend backup-file URL:
+Expected: HTTP 404</div>
+
+    <p>
+        nginx blocks backup-style files and
+        <code>.vscode</code> paths. The frontend
+        <code>.dockerignore</code> also prevents those files from
+        being copied into new frontend images.
+    </p>
+
+</section>
+
+
+<section class="help-section">
+
+    <h2>7. Solve History and Diagnostic Result Semantics</h2>
+
+    <p>
+        Solve History is an operational audit source for both
+        successful and failed requests.
+    </p>
+
+    <p>
+        Depending on the request and its result, records can contain
+        the equation, executed method, success state, result or error,
+        iteration count, selection source, request source, rAIson
+        recommendation and rAIson explanation.
+    </p>
+
+    <h3>Symbolic multi-solution results</h3>
+
+    <p>
+        When Symbolic Solve produces more than one solution,
+        the top-level <code>root</code> value can represent the first
+        solution used for compatibility with the common solver
+        response shape.
+    </p>
+
+    <p>
+        The complete symbolic result can additionally contain:
+    </p>
+
+    <div class="help-code">solutions
+analytical_solutions
+numeric_solutions</div>
+
+    <p>
+        Administrators diagnosing symbolic requests should inspect
+        the complete solution collections instead of assuming that
+        the single <code>root</code> field represents every solution.
+    </p>
+
+    <h3>Legacy records</h3>
+
+    <p>
+        Older rows can contain historical method names, selection
+        values or missing fields that predate the current production
+        schema. Missing historical data must not be reconstructed or
+        invented.
+    </p>
+
+</section>
+
+
+<section class="help-section">
+
+    <h2>8. User Help Boundary and Incident Diagnosis</h2>
+
+    <p>
+        The normal User Help is the authoritative source for
+        user-facing mathematical syntax, accepted notation,
+        supported functions, solver inputs, examples and criterion
+        descriptions.
+    </p>
+
+    <p>
+        The Administrator Manual should instead be used when the
+        issue concerns deployment, authentication, API access,
+        persistence, method-selection flow, service availability,
+        logging, HTTPS, infrastructure or recovery.
+    </p>
+
+    <h3>Recommended incident sequence</h3>
+
+    <ol>
+        <li>
+            Confirm that the reported input follows the current
+            User Help.
+        </li>
+        <li>Check public and internal backend health.</li>
+        <li>Inspect the corresponding Solve History entry.</li>
+        <li>Inspect backend logs.</li>
+        <li>
+            Determine whether the failure belongs to parsing,
+            solver execution, rAIson selection, authentication,
+            database persistence, nginx or Caddy.
+        </li>
+        <li>
+            Reproduce only with non-secret test data before modifying
+            production code or configuration.
+        </li>
+    </ol>
+
+</section>
+
+<section class="help-section">
+
+            <h2>9. Production Quick Reference</h2>
+
+            <p>
+                The production project is located at:
+            </p>
+
+            <div class="help-code">/home/rosinante/ABESS_LOCAL/backend</div>
+
+            <p>
+                Before running production commands:
+            </p>
+
+            <div class="help-code">cd ~/ABESS_LOCAL/backend</div>
+
+            <div class="help-info">
+                The production environment uses
+                <strong>docker-compose.production.yml</strong>.
+            </div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- CONTAINERS -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>10. Start, Stop and Restart</h2>
+
+            <h3>Check container status</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml ps</div>
+
+            <h3>Start the application</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml up -d</div>
+
+            <h3>Rebuild after source-code changes</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml up -d --build</div>
+
+            <h3>Restart only the backend</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml restart backend</div>
+
+            <h3>Restart only the frontend</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml restart frontend</div>
+
+            <h3>Stop the production stack</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml down</div>
+
+            <div class="help-warning">
+                <strong>Never use:</strong>
+                <div class="help-code">docker compose -f docker-compose.production.yml down -v</div>
+
+                The <code>-v</code> option can delete Docker volumes,
+                including persistent application data.
+            </div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- HEALTH -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>11. Backend Health Check</h2>
+
+            <p>
+                Use this command to confirm that the FastAPI backend is responding:
+            </p>
+
+            <div class="help-code">docker exec equation-solver-backend python -c "import requests; r=requests.get('http://127.0.0.1:8000/health', timeout=10); print(r.status_code); print(r.text)"</div>
+
+            <p>
+                Expected result:
+            </p>
+
+            <div class="help-code">200
+{"status":"Backend is running"}</div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+
+        <!-- PUBLIC_AND_INTERNAL_HEALTH_V2 -->
+
+        <section class="help-section">
+
+            <h2>12. Public and Internal Health Verification</h2>
+
+            <h3>Public HTTPS health check</h3>
+
+            <p>
+                <strong>When to use it:</strong>
+                after deployment, restart, Caddy changes or a server reboot.
+            </p>
+
+            <div class="help-code">curl -i https://abess.hmu.gr/api/health</div>
+
+            <p>
+                <strong>Expected result:</strong>
+            </p>
+
+            <div class="help-code">HTTP/2 200
+
+{"status":"Backend is running"}</div>
+
+
+            <h3>Internal FastAPI health check</h3>
+
+            <p>
+                <strong>When to use it:</strong>
+                when the public request fails and it is necessary to
+                determine whether FastAPI itself is healthy.
+            </p>
+
+            <div class="help-code">docker exec equation-solver-backend python -c "import requests; r=requests.get('http://127.0.0.1:8000/health', timeout=10); print(r.status_code); print(r.text)"</div>
+
+
+            <div class="help-info">
+                The FastAPI application defines the internal route
+                <code>/health</code>. nginx proxies public
+                <code>/api/...</code> requests to the backend while
+                removing the <code>/api</code> prefix. Therefore
+                public <code>/api/health</code> maps to backend
+                <code>/health</code>.
+            </div>
+
+<p>
+                <strong>Expected result:</strong>
+            </p>
+
+            <div class="help-code">200
+{"status":"Backend is running"}</div>
+
+            <div class="help-info">
+                If the internal check succeeds but the public HTTPS
+                check fails, investigate Caddy, routing, certificates,
+                DNS and frontend/reverse-proxy configuration rather than
+                the equation solver itself.
+            </div>
+
+        </section>
+
+
+        <!-- LOGS -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>13. Logs</h2>
+
+            <h3>Backend logs</h3>
+
+            <div class="help-code">docker logs --tail 100 equation-solver-backend</div>
+
+            <h3>Live backend logs</h3>
+
+            <div class="help-code">docker logs -f equation-solver-backend</div>
+
+            <h3>Frontend logs</h3>
+
+            <div class="help-code">docker logs --tail 100 equation-solver-frontend</div>
+
+            <h3>Live frontend logs</h3>
+
+            <div class="help-code">docker logs -f equation-solver-frontend</div>
+
+            <h3>Caddy logs</h3>
+
+            <div class="help-code">docker logs --tail 100 equation-solver-caddy</div>
+
+            <h3>Live Caddy logs</h3>
+
+            <div class="help-code">docker logs -f equation-solver-caddy</div>
+
+            <p>
+                Press <strong>Ctrl+C</strong> to stop following live logs.
+            </p>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- DOCKER SERVICE -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>14. Docker Service</h2>
+
+            <h3>Check if Docker is running</h3>
+
+            <div class="help-code">systemctl is-active docker</div>
+
+            <p>
+                Expected:
+            </p>
+
+            <div class="help-code">active</div>
+
+            <h3>Check automatic Docker startup</h3>
+
+            <div class="help-code">systemctl is-enabled docker</div>
+
+            <p>
+                Expected:
+            </p>
+
+            <div class="help-code">enabled</div>
+
+            <h3>Start Docker if required</h3>
+
+            <div class="help-code">sudo systemctl start docker</div>
+
+            <h3>Check containers after a server reboot</h3>
+
+            <div class="help-code">docker ps</div>
+
+            <div class="help-info">
+                The production containers use the
+                <strong>unless-stopped</strong> restart policy.
+            </div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- DATABASE -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>15. Production Database</h2>
+
+            <p>
+                The production SQLite database is:
+            </p>
+
+            <div class="help-code">/data/app.db</div>
+
+            <p>
+                It is stored inside the Docker volume:
+            </p>
+
+            <div class="help-code">backend_app_data</div>
+
+            <div class="help-warning">
+                <strong>Important:</strong>
+                the file
+                <code>backend/app.db</code>
+                is not the live production database.
+
+                Never replace the production database with that local file.
+            </div>
+
+            <h3>Check database integrity</h3>
+
+            <div class="help-code">docker exec equation-solver-backend python -c "import sqlite3; c=sqlite3.connect('/data/app.db'); print(c.execute('PRAGMA integrity_check').fetchone()[0]); c.close()"</div>
+
+            <p>
+                Expected:
+            </p>
+
+            <div class="help-code">ok</div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- BACKUP -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>16. Database Backup</h2>
+
+            <p>
+                Create the backup directory if it does not already exist:
+            </p>
+
+            <div class="help-code">mkdir -p backups</div>
+
+            <p>
+                Create a consistent SQLite backup:
+            </p>
+
+            <div class="help-code">docker exec equation-solver-backend python -c "import sqlite3; s=sqlite3.connect('/data/app.db'); d=sqlite3.connect('/tmp/app_backup.db'); s.backup(d); d.close(); s.close()"</div>
+
+            <p>
+                Copy it from the container to the project:
+            </p>
+
+            <div class="help-code">docker cp equation-solver-backend:/tmp/app_backup.db "backups/app_$(date +%F_%H%M%S).db"</div>
+
+            <h3>Check a backup file</h3>
+
+            <div class="help-code">python3 -c "import sqlite3; c=sqlite3.connect('backups/BACKUP_FILE.db'); print(c.execute('PRAGMA integrity_check').fetchone()[0]); c.close()"</div>
+
+            <div class="help-success">
+                A valid backup should return <strong>ok</strong>.
+            </div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- RESTORE -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>17. Restore a Database Backup</h2>
+
+            <div class="help-warning">
+                Restore only a backup that has already passed
+                <strong>PRAGMA integrity_check</strong>.
+            </div>
+
+            <p>
+                First stop the backend:
+            </p>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml stop backend</div>
+
+            <p>
+                Copy the selected backup into the persistent database location:
+            </p>
+
+            <div class="help-code">docker cp backups/BACKUP_FILE.db equation-solver-backend:/data/app.db</div>
+
+            <p>
+                Start the backend again:
+            </p>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml start backend</div>
+
+            <p>
+                Then run the database integrity check and backend health check.
+            </p>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- ADMIN DASHBOARD -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>18. Admin Dashboard</h2>
+
+            <p>
+                The Admin Dashboard provides a summary of application
+                activity together with registered-user, solve-history
+                and guest-usage information.
+            </p>
+
+            <div class="help-info">
+                The dashboard is read-only. It is intended for
+                monitoring application usage and reviewing recorded
+                activity. It does not display user passwords or
+                personal API keys.
+            </div>
+
+
+            <h3>Overview statistics</h3>
+
+            <div class="help-table-wrapper">
+
+                <table class="help-table">
+
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Registered Users</td>
+                            <td>
+                                Number of registered user accounts
+                                stored by the application.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Total Attempts</td>
+                            <td>
+                                Total number of recorded equation-solving
+                                attempts. This includes both successful
+                                and failed attempts.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Successful</td>
+                            <td>
+                                Recorded attempts that produced a valid
+                                solver result.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Failed</td>
+                            <td>
+                                Recorded attempts that did not produce
+                                a valid solver result.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Manual</td>
+                            <td>
+                                Attempts where the solving method was
+                                selected directly by the user.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>rAIson</td>
+                            <td>
+                                Attempts where method selection was
+                                performed through the Automatic / rAIson
+                                flow.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Web Requests</td>
+                            <td>
+                                Recorded attempts originating from the
+                                normal web-application flow.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>API Requests</td>
+                            <td>
+                                Recorded attempts authenticated with a
+                                registered user's personal API key.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Guest Users</td>
+                            <td>
+                                Number of guest-usage records created
+                                by the application.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Guest Attempts</td>
+                            <td>
+                                Total number of solver uses recorded
+                                for guest sessions.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Verified Users</td>
+                            <td>
+                                Registered users whose email address
+                                has been successfully verified.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <h3>Users tab</h3>
+
+            <p>
+                The Users tab lists the registered accounts known to
+                the application.
+            </p>
+
+            <ul>
+                <li>
+                    <strong>ID:</strong>
+                    internal database identifier of the account.
+                </li>
+
+                <li>
+                    <strong>Email:</strong>
+                    registered email address.
+                </li>
+
+                <li>
+                    <strong>Role:</strong>
+                    normally <code>user</code> or
+                    <code>admin</code>.
+                </li>
+
+                <li>
+                    <strong>Verified:</strong>
+                    indicates whether email verification has been
+                    completed.
+                </li>
+
+                <li>
+                    <strong>Active:</strong>
+                    indicates whether the account is currently enabled.
+                </li>
+
+                <li>
+                    <strong>Created:</strong>
+                    account creation date and time.
+                </li>
+            </ul>
+
+
+            <h3>Solve History tab</h3>
+
+            <p>
+                Solve History contains the recorded solving attempts,
+                including both successful and failed attempts.
+            </p>
+
+            <div class="help-table-wrapper">
+
+                <table class="help-table">
+
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>User</td>
+                            <td>
+                                Registered-user email when available,
+                                otherwise the corresponding guest
+                                identifier.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Equation</td>
+                            <td>
+                                Equation or expression submitted to the
+                                solver.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Method</td>
+                            <td>
+                                Solver method associated with the
+                                recorded attempt.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Status</td>
+                            <td>
+                                <strong>Success</strong> means that a
+                                valid result was produced.
+                                <strong>Failed</strong> means that the
+                                attempt ended without a valid result.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Result / Error</td>
+                            <td>
+                                Shows the result for a successful attempt.
+                                For a failed attempt, the stored error code
+                                and user-readable error message are shown
+                                when available.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Selection</td>
+                            <td>
+                                <strong>Manual</strong> means the method
+                                was selected directly by the user.
+                                <strong>rAIson</strong> means the method
+                                was selected through the Automatic /
+                                rAIson flow.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Request</td>
+                            <td>
+                                <strong>WEB</strong> indicates the normal
+                                web-application flow.
+                                <strong>API</strong> indicates a request
+                                authenticated with a personal API key.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Date</td>
+                            <td>
+                                Date and time at which the attempt was
+                                recorded.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="help-info">
+                Older database records may contain legacy values such
+                as <code>automatic_fallback</code> or may not contain
+                the newer status or request-source information.
+                These records are preserved as historical data.
+            </div>
+
+
+            <h3>Guests tab</h3>
+
+            <p>
+                The Guests tab summarizes usage performed without a
+                registered account.
+            </p>
+
+            <ul>
+                <li>
+                    <strong>Guest ID:</strong>
+                    anonymous identifier assigned to the guest session.
+                </li>
+
+                <li>
+                    <strong>Attempts:</strong>
+                    number of solver uses recorded for that guest.
+                </li>
+
+                <li>
+                    <strong>Created:</strong>
+                    time at which the guest-usage record was created.
+                </li>
+
+                <li>
+                    <strong>Last Used:</strong>
+                    most recent recorded use of that guest identifier.
+                </li>
+            </ul>
+
+
+            <h3>Refresh</h3>
+
+            <p>
+                Use the <strong>Refresh</strong> button to request the
+                latest statistics, users, solve history and guest data
+                from the backend.
+            </p>
+
+        </section>
+
+
+        <!-- ===================================== -->
+
+        <!-- ADMIN_DASHBOARD_DETAILED_V2 -->
+
+        <section class="help-section">
+
+            <h2>19. Dashboard Method Usage and Detailed History</h2>
+
+            <h3>Method Usage</h3>
+
+            <p>
+                The Method Usage table summarizes recorded attempts for
+                each solver. The nine production methods are always
+                represented, even when a method currently has zero
+                recorded uses.
+            </p>
+
+            <div class="help-table-wrapper">
+
+                <table class="help-table">
+
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Method</td>
+                            <td>
+                                Solver associated with the recorded
+                                history entries.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Attempts</td>
+                            <td>
+                                Total recorded attempts using that method.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Successful</td>
+                            <td>
+                                Attempts whose stored success flag is true.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Failed</td>
+                            <td>
+                                Attempts whose stored success flag is false.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Unknown / Legacy</td>
+                            <td>
+                                Older records that predate the modern
+                                explicit success-status field.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <h3>Detailed Solve History</h3>
+
+            <p>
+                The administrator receives more information than the
+                normal user History view.
+            </p>
+
+            <div class="help-table-wrapper">
+
+                <table class="help-table">
+
+                    <thead>
+                        <tr>
+                            <th>Column</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>ID</td>
+                            <td>Database history identifier.</td>
+                        </tr>
+
+                        <tr>
+                            <td>User</td>
+                            <td>
+                                Registered-user email or guest identifier.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Equation</td>
+                            <td>Submitted equation or expression.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Method</td>
+                            <td>Method actually associated with execution.</td>
+                        </tr>
+
+                        <tr>
+                            <td>Status</td>
+                            <td>
+                                Success, Failed or Unknown for legacy data.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Result / Error</td>
+                            <td>
+                                Numerical or symbolic result, or the stored
+                                error code/message when the attempt failed.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Selection</td>
+                            <td>
+                                Manual or rAIson method-selection source.
+                                Historical fallback values may also exist.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Request</td>
+                            <td>
+                                WEB for browser-originated requests or API
+                                for personal API-key requests.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Iterations</td>
+                            <td>
+                                Iteration count when the solver provides one.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>rAIson Suggested</td>
+                            <td>
+                                Method returned by rAIson when an Automatic
+                                request used the decision service.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>rAIson Explanation</td>
+                            <td>
+                                Human-readable explanation associated with
+                                the rAIson recommendation when available.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Date</td>
+                            <td>Date and time stored for the attempt.</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="help-info">
+                Older records may not contain all modern fields.
+                Missing information must be displayed as unknown or
+                unavailable rather than reconstructed or invented.
+            </div>
+
+        </section>
+
+
+        <!-- JWT -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>20. Login, JWT and SECRET_KEY</h2>
+
+            <p>
+                User and administrator sessions use JWT access tokens.
+            </p>
+
+            <p>
+                If a token expires or becomes invalid, log in again.
+            </p>
+
+            <div class="help-warning">
+                Never manually create or edit JWT tokens.
+            </div>
+
+            <h3>Generate a new SECRET_KEY</h3>
+
+            <div class="help-code">python3 -c "import secrets; print(secrets.token_urlsafe(64))"</div>
+
+            <p>
+                Open the production <code>.env</code> file and replace only:
+            </p>
+
+            <div class="help-code">SECRET_KEY=...</div>
+
+            <p>
+                Then recreate the backend container:
+            </p>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml up -d --force-recreate backend</div>
+
+            <div class="help-info">
+                Changing <code>SECRET_KEY</code> invalidates existing JWT sessions,
+                but does not delete users, solve history, or the database.
+            </div>
+
+            <div class="help-warning">
+                Never place the SECRET_KEY in documentation,
+                screenshots, Git repositories, messages, or public files.
+            </div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- HTTPS -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>21. HTTPS, Caddy and Certificates</h2>
+
+            <p>
+                The public domain is:
+            </p>
+
+            <div class="help-code">abess.hmu.gr</div>
+
+            <p>
+                Caddy is the production reverse proxy and listens on HTTPS port 443.
+            </p>
+
+            <div class="help-info">
+                Certificate issuance must comply with the current DNS CAA
+                policy for <code>abess.hmu.gr</code>. Because CAA records can
+                change, always inspect the live DNS records before requesting
+                or replacing a certificate instead of relying on an old
+                documented certificate-authority list.
+            </div>
+
+            <div class="help-warning">
+                Never send or copy the private TLS key to another person.
+                The private key must remain on the server.
+            </div>
+
+            <p>
+                Before changing the Caddy TLS configuration, confirm the exact
+                certificate and full-chain filenames supplied by the certificate authority.
+            </p>
+
+            <h3>Caddy status</h3>
+
+            <div class="help-code">docker ps --filter name=equation-solver-caddy</div>
+
+            <h3>Caddy logs</h3>
+
+            <div class="help-code">docker logs --tail 100 equation-solver-caddy</div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- TROUBLESHOOTING -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>22. Troubleshooting</h2>
+
+            <h3>The application does not open</h3>
+
+            <ol>
+                <li>Check Docker.</li>
+                <li>Check all containers.</li>
+                <li>Check Caddy logs.</li>
+                <li>Check frontend logs.</li>
+                <li>Check backend health.</li>
+            </ol>
+
+            <div class="help-code">systemctl is-active docker
+docker compose -f docker-compose.production.yml ps
+docker logs --tail 100 equation-solver-caddy
+docker logs --tail 100 equation-solver-frontend
+docker exec equation-solver-backend python -c "import requests; r=requests.get('http://127.0.0.1:8000/health', timeout=10); print(r.status_code); print(r.text)"</div>
+
+            <h3>The frontend opens but solving does not work</h3>
+
+            <div class="help-code">docker logs --tail 100 equation-solver-backend</div>
+
+            <p>
+                Also run the backend health check.
+            </p>
+
+            <h3>rAIson is not responding</h3>
+
+            <p>
+                Check backend logs first. Do not print or expose API keys.
+            </p>
+
+            <div class="help-code">docker logs --tail 100 equation-solver-backend</div>
+
+            <h3>Admin login does not work</h3>
+
+            <p>
+                Confirm:
+            </p>
+
+            <ul>
+                <li>The account is active.</li>
+                <li>The account is verified.</li>
+                <li>The account has administrator permissions.</li>
+                <li>The backend is healthy.</li>
+            </ul>
+
+            <h3>Changes do not appear in the browser</h3>
+
+            <p>
+                Rebuild the relevant container:
+            </p>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml up -d --build frontend</div>
+
+            <p>
+                Then perform a hard refresh in the browser.
+            </p>
+
+        </section>
+
+
+        <!-- ===================================== -->
+
+        <!-- ADMIN_PRODUCTION_MANUAL_V2 -->
+
+        <!-- ===================================== -->
+        <!-- FILE MAP -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+    <h2>23. Production File Map</h2>
+
+    <p>
+        The current production project root is:
+    </p>
+
+    <div class="help-code">/home/rosinante/ABESS_LOCAL/backend</div>
+
+    <div class="help-table-wrapper">
+        <table class="help-table">
+            <thead>
+                <tr>
+                    <th>File / directory</th>
+                    <th>Administrative purpose</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td><code>docker-compose.production.yml</code></td>
+                    <td>
+                        Production definitions for backend, frontend,
+                        Caddy and persistent volumes.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>Dockerfile</code></td>
+                    <td>Backend image definition.</td>
+                </tr>
+
+                <tr>
+                    <td><code>Caddyfile</code></td>
+                    <td>
+                        Public HTTPS and reverse-proxy configuration.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>certs/</code></td>
+                    <td>
+                        Active production TLS certificate and private
+                        key files. Treat as sensitive server data.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>app/main.py</code></td>
+                    <td>
+                        FastAPI application setup, router registration
+                        and internal health endpoint.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>app/routers/auth.py</code></td>
+                    <td>
+                        Registration, login, verification, password
+                        reset and registered-user endpoints.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>app/routers/equation.py</code></td>
+                    <td>
+                        Solver request flow, authentication source,
+                        rAIson flow and Solve History recording.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>app/routers/admin.py</code></td>
+                    <td>
+                        Administrator authorization, dashboard data
+                        and protected Manual endpoint.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>app/manual/admin_manual.html</code></td>
+                    <td>
+                        Full protected Administrator Manual content.
+                        Included in the backend image.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>app/services/equation_solver.py</code></td>
+                    <td>
+                        Mathematical parser, evaluators and solver
+                        execution.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>app/services/raison_service.py</code></td>
+                    <td>
+                        External rAIson communication and associated
+                        configuration handling.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>app/models/</code></td>
+                    <td>SQLAlchemy production data models.</td>
+                </tr>
+
+                <tr>
+                    <td><code>frontend/index.html</code></td>
+                    <td>
+                        Main browser application and normal User Help.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>frontend/admin.html</code></td>
+                    <td>Administrator Dashboard page.</td>
+                </tr>
+
+                <tr>
+                    <td><code>frontend/admin-help.html</code></td>
+                    <td>
+                        Small public loader only. It does not contain
+                        the full Administrator Manual body.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>frontend/nginx.conf</code></td>
+                    <td>
+                        Static frontend serving, backend proxy and
+                        public backup-file protection.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>frontend/.dockerignore</code></td>
+                    <td>
+                        Prevents backup/editor files from entering the
+                        frontend Docker image.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>frontend/assets/js/auth.js</code></td>
+                    <td>
+                        Browser authentication state and admin-button
+                        visibility.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>frontend/assets/js/admin.js</code></td>
+                    <td>Admin Dashboard browser behavior.</td>
+                </tr>
+
+                <tr>
+                    <td><code>frontend/assets/js/solve.js</code></td>
+                    <td>Main solver browser behavior.</td>
+                </tr>
+
+                <tr>
+                    <td><code>.env</code></td>
+                    <td>
+                        Production configuration and secrets.
+                        Never publish its values.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><code>backups/</code></td>
+                    <td>
+                        Server-local database, source and operational
+                        backup material.
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</section>
+
+<section class="help-section">
+
+            <h2>24. Safe Change and Deployment Workflow</h2>
+
+            <p>
+                Use this sequence whenever production source code or
+                configuration must be changed.
+            </p>
+
+            <ol>
+
+                <li>
+                    Confirm the current working directory.
+                </li>
+
+                <li>
+                    Create a backup of the file that will be changed.
+                </li>
+
+                <li>
+                    Edit only the intended source file.
+                </li>
+
+                <li>
+                    Run syntax or configuration validation before
+                    rebuilding.
+                </li>
+
+                <li>
+                    Rebuild only the service affected by the change
+                    whenever possible.
+                </li>
+
+                <li>
+                    Inspect logs.
+                </li>
+
+                <li>
+                    Run the public health check.
+                </li>
+
+                <li>
+                    Perform the relevant browser/API regression test.
+                </li>
+
+            </ol>
+
+
+            <h3>Confirm directory</h3>
+
+            <div class="help-code">cd ~/ABESS_LOCAL/backend
+pwd</div>
+
+            <p>
+                <strong>Expected result:</strong>
+            </p>
+
+            <div class="help-code">/home/rosinante/ABESS_LOCAL/backend</div>
+
+
+            <h3>Example file backup</h3>
+
+            <div class="help-code">cp app/routers/equation.py app/routers/equation.py.bak_before_change</div>
+
+
+            <h3>Validate a Python file</h3>
+
+            <div class="help-code">python3 -m py_compile app/routers/equation.py</div>
+
+            <p>
+                <strong>Expected result:</strong>
+                no output and exit status 0.
+            </p>
+
+
+            <h3>Rebuild backend only</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml up -d --build backend</div>
+
+
+            <h3>Rebuild frontend only</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml up -d --build frontend</div>
+
+
+            <h3>Rebuild backend and frontend</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml up -d --build backend frontend</div>
+
+
+            <h3>After a frontend change</h3>
+
+            <p>
+                Increment the relevant frontend cache version when
+                appropriate and perform a hard refresh in the browser:
+            </p>
+
+            <div class="help-code">Ctrl + Shift + R</div>
+
+            <div class="help-warning">
+                A simple container restart does not incorporate source
+                changes when the source code was copied into the Docker
+                image during build. In that case use
+                <code>--build</code>.
+            </div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- ENV -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+    <h2>25. Environment Configuration and Secrets</h2>
+
+    <p>
+        Backend production configuration is loaded through the
+        Compose environment and the project
+        <code>.env</code> file.
+    </p>
+
+    <h3>List variable names without displaying values</h3>
+
+    <div class="help-code">sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1=&lt;set&gt;/p' .env</div>
+
+    <div class="help-warning">
+        Do not print the complete production environment into
+        screenshots, chat messages, documentation or source control.
+    </div>
+
+    <h3>Core configuration categories</h3>
+
+    <div class="help-code">SECRET_KEY
+ADMIN_EMAIL
+DATABASE_URL
+BACKEND_URL
+GUEST_SOLVE_LIMIT
+
+RAISON_APP_ID
+RAISON_VERSION
+RAISON_API_KEY
+RAISON_TIMEOUT_SECONDS
+RAISON_METADATA_CACHE_SECONDS</div>
+
+    <h3>Email and account-recovery configuration</h3>
+
+    <div class="help-code">MAIL_HOST
+MAIL_PORT
+MAIL_USERNAME
+MAIL_PASSWORD
+MAIL_FROM
+FRONTEND_URL
+PUBLIC_BASE_URL
+BACKEND_URL</div>
+
+    <p>
+        <code>MAIL_PORT</code> defaults to
+        <code>587</code> when it is not explicitly set.
+    </p>
+
+    <p>
+        Verification emails build their verification URL from
+        <code>PUBLIC_BASE_URL</code>, with
+        <code>BACKEND_URL</code> available as a fallback in the
+        current authentication implementation.
+    </p>
+
+    <p>
+        Password-reset emails use
+        <code>FRONTEND_URL</code> to create the browser reset link.
+    </p>
+
+    <div class="help-warning">
+        <code>SECRET_KEY</code>,
+        <code>MAIL_PASSWORD</code>,
+        <code>RAISON_API_KEY</code> and any other credential must
+        never be exposed.
+    </div>
+
+    <h3>After an environment change</h3>
+
+    <div class="help-code">docker compose -f docker-compose.production.yml up -d --force-recreate backend</div>
+
+    <p>
+        If backend source code or the Docker image also changed:
+    </p>
+
+    <div class="help-code">docker compose -f docker-compose.production.yml up -d --build backend</div>
+
+    <p>
+        Changing <code>SECRET_KEY</code> invalidates existing JWT
+        sessions. Do not rotate it as a routine troubleshooting step.
+    </p>
+
+</section>
+
+<section class="help-section">
+
+            <h2>26. Docker, Uvicorn and nginx Runtime Inspection</h2>
+
+            <h3>List production services</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml config --services</div>
+
+            <p>
+                <strong>Expected services:</strong>
+                backend, frontend and caddy.
+            </p>
+
+
+            <h3>Container status</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml ps</div>
+
+
+            <h3>Running containers</h3>
+
+            <div class="help-code">docker ps</div>
+
+
+            <h3>Inspect backend startup command</h3>
+
+            <p>
+                <strong>When to use it:</strong>
+                verify how Uvicorn is actually started in the deployed
+                backend container.
+            </p>
+
+            <div class="help-code">docker inspect equation-solver-backend --format '{{json .Config.Cmd}}'</div>
+
+
+            <h3>Backend image</h3>
+
+            <div class="help-code">docker inspect equation-solver-backend --format '{{.Config.Image}}'</div>
+
+
+            <h3>Frontend nginx configuration test</h3>
+
+            <div class="help-code">docker exec equation-solver-frontend nginx -t</div>
+
+            <p>
+                <strong>Expected result:</strong>
+                nginx reports that the configuration syntax is valid.
+            </p>
+
+
+            <h3>Inspect active nginx configuration</h3>
+
+            <div class="help-code">docker exec equation-solver-frontend nginx -T</div>
+
+            <div class="help-info">
+                Uvicorn serves the FastAPI ASGI application.
+                nginx serves the static frontend.
+                Caddy is the public HTTPS reverse proxy.
+            </div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- CADDY DEEP -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>27. Caddy, HTTPS, TLS and Reverse Proxy Operations</h2>
+
+
+            <h3>Current ABESS TLS configuration</h3>
+
+            <p>
+                The current production configuration uses an explicit
+                certificate and private key rather than Caddy-managed
+                automatic HTTPS.
+            </p>
+
+            <div class="help-code">abess.hmu.gr {
+    tls /etc/caddy/certs/abess-fullchain.pem /etc/caddy/certs/abess-private.key
+    reverse_proxy frontend:80
+}</div>
+
+            <p>
+                The host-side directory
+                <code>~/ABESS_LOCAL/backend/certs</code>
+                is mounted read-only inside the Caddy container as
+                <code>/etc/caddy/certs</code>.
+            </p>
+
+            <div class="help-code">Host:
+certs/abess-fullchain.pem
+certs/abess-private.key
+
+Container:
+/etc/caddy/certs/abess-fullchain.pem
+/etc/caddy/certs/abess-private.key</div>
+
+            <p>
+                The current expected host permissions are:
+            </p>
+
+            <div class="help-code">abess-fullchain.pem : 0644
+abess-private.key    : 0600</div>
+
+            <div class="help-warning">
+                The private key must never be displayed, copied into
+                documentation, committed to Git or sent through messages.
+            </div>
+
+            <p>
+                At the time this manual was updated, the deployed
+                certificate was issued by HARICA for
+                <code>abess.hmu.gr</code> and was valid until
+                <strong>11 April 2027</strong>.
+                Always verify the live certificate before maintenance
+                because certificate metadata changes after renewal.
+            </p>
+
+
+            <h3>Current ABESS certificate replacement procedure</h3>
+
+            <p>
+                Because the current production Caddyfile references fixed
+                filenames, a normal certificate renewal can keep the same
+                filenames and replace their contents on the host.
+            </p>
+
+            <ol>
+                <li>
+                    Confirm that the replacement full-chain certificate
+                    and private key are the intended files.
+                </li>
+
+                <li>
+                    Verify certificate metadata and confirm that the
+                    certificate and key belong to the same key pair.
+                </li>
+
+                <li>
+                    Back up the two active TLS files locally on the server.
+                </li>
+
+                <li>
+                    Replace the active host-side files while keeping the
+                    same production filenames.
+                </li>
+
+                <li>
+                    Restore the expected permissions and verify ownership.
+                </li>
+
+                <li>
+                    Validate the Caddy configuration before restart.
+                </li>
+
+                <li>
+                    Restart Caddy and verify the public certificate,
+                    website and API health endpoint.
+                </li>
+            </ol>
+
+            <h3>Back up the currently active ABESS certificate</h3>
+
+            <p>
+                Keep certificate backups outside the active
+                <code>certs/</code> directory.
+                Private-key backups must remain on the server with
+                restricted permissions.
+            </p>
+
+            <div class="help-code">cd ~/ABESS_LOCAL/backend
+
+mkdir -p backups/tls
+chmod 700 backups/tls
+
+stamp=$(date +%F_%H%M%S)
+
+cp certs/abess-fullchain.pem \
+"backups/tls/abess-fullchain.pem.$stamp"
+
+cp certs/abess-private.key \
+"backups/tls/abess-private.key.$stamp"
+
+chmod 600 \
+"backups/tls/abess-private.key.$stamp"
+
+ls -l backups/tls</div>
+
+            <h3>Install a replacement using the existing production filenames</h3>
+
+            <div class="help-code">cp NEW_FULLCHAIN.pem certs/abess-fullchain.pem
+
+cp NEW_PRIVATE_KEY.key certs/abess-private.key
+
+chmod 644 certs/abess-fullchain.pem
+chmod 600 certs/abess-private.key
+
+ls -l certs/abess-fullchain.pem certs/abess-private.key</div>
+
+            <div class="help-warning">
+                <code>NEW_FULLCHAIN.pem</code> and
+                <code>NEW_PRIVATE_KEY.key</code> are placeholders.
+                Replace them with the real new files only after validating
+                them. Preserve the current ownership unless there is a
+                deliberate administrative reason to change it.
+            </div>
+
+            <h3>Validate and activate the current ABESS TLS files</h3>
+
+            <div class="help-code">docker exec equation-solver-caddy caddy validate --config /etc/caddy/Caddyfile
+
+docker compose -f docker-compose.production.yml restart caddy
+
+docker logs --tail 100 equation-solver-caddy
+
+curl -I https://abess.hmu.gr
+
+curl -i https://abess.hmu.gr/api/health
+
+openssl s_client -connect abess.hmu.gr:443 -servername abess.hmu.gr &lt;/dev/null 2&gt;/dev/null | openssl x509 -noout -subject -issuer -dates -serial</div>
+
+            <p>
+                The public production domain is:
+            </p>
+
+            <div class="help-code">https://abess.hmu.gr</div>
+
+            <h3>Check Caddy container</h3>
+
+            <div class="help-code">docker ps --filter name=equation-solver-caddy</div>
+
+
+            <h3>Check Caddy version</h3>
+
+            <div class="help-code">docker exec equation-solver-caddy caddy version</div>
+
+
+            <h3>Find the mounted Caddy configuration</h3>
+
+            <p>
+                <strong>When to use it:</strong>
+                before editing Caddy. Do not guess the host-side file path.
+            </p>
+
+            <div class="help-code">docker inspect equation-solver-caddy --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'</div>
+
+            <p>
+                Identify which host file is mounted to the Caddy
+                configuration destination before editing anything.
+            </p>
+
+
+            <h3>Inspect container command</h3>
+
+            <div class="help-code">docker inspect equation-solver-caddy --format '{{json .Config.Cmd}}'</div>
+
+
+            <h3>Validate the Caddyfile</h3>
+
+            <p>
+                If the previous inspection confirms the standard
+                destination <code>/etc/caddy/Caddyfile</code>:
+            </p>
+
+            <div class="help-code">docker exec equation-solver-caddy caddy validate --config /etc/caddy/Caddyfile</div>
+
+            <p>
+                <strong>Expected result:</strong>
+                valid configuration with no syntax error.
+            </p>
+
+
+            <h3>Restart Caddy after a validated configuration change</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml restart caddy</div>
+
+
+            <h3>Caddy logs</h3>
+
+            <div class="help-code">docker logs --tail 100 equation-solver-caddy</div>
+
+
+            <h3>Live Caddy logs</h3>
+
+            <div class="help-code">docker logs -f equation-solver-caddy</div>
+
+            <p>
+                Press <strong>Ctrl+C</strong> to stop following logs.
+            </p>
+
+
+            <h3>Check HTTPS headers</h3>
+
+            <div class="help-code">curl -I https://abess.hmu.gr</div>
+
+
+            <h3>Check API through Caddy</h3>
+
+            <div class="help-code">curl -i https://abess.hmu.gr/api/health</div>
+
+
+            <h3>Inspect the current TLS certificate</h3>
+
+            <div class="help-code">openssl s_client -connect abess.hmu.gr:443 -servername abess.hmu.gr &lt;/dev/null 2&gt;/dev/null | openssl x509 -noout -subject -issuer -dates</div>
+
+            <p>
+                This reports certificate subject, issuer, validity
+                start and expiration date.
+            </p>
+
+
+            <h3>Check DNS CAA records</h3>
+
+            <div class="help-code">dig CAA abess.hmu.gr +short</div>
+
+            <div class="help-warning">
+                Never display, transmit, publish or commit a TLS private key. A protected server-local backup is permitted when required for recovery.
+                Before replacing certificates or modifying TLS paths,
+                create a backup of the current Caddy configuration
+                and confirm the exact certificate/full-chain/private-key
+                filenames in use.
+            </div>
+
+
+            <h3>Determine how TLS is currently managed</h3>
+
+            <p>
+                Do not assume that the server uses manually installed
+                certificate files. First inspect the active Caddy
+                configuration.
+            </p>
+
+            <div class="help-code">docker inspect equation-solver-caddy --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
+
+docker exec equation-solver-caddy caddy adapt --config /etc/caddy/Caddyfile --pretty</div>
+
+            <p>
+                If the Caddy configuration uses normal automatic HTTPS
+                without an explicit certificate/key pair, Caddy manages
+                certificate issuance and renewal itself. In that case,
+                do not manually replace files inside Caddy's certificate
+                storage. Investigate DNS, CAA, network access, persistent
+                Caddy storage and Caddy logs if renewal fails.
+            </p>
+
+            <p>
+                If the Caddyfile contains an explicit TLS certificate
+                and private-key configuration, follow the manual
+                certificate-replacement procedure below.
+            </p>
+
+
+            <h3>Manual certificate replacement - preparation</h3>
+
+            <ol>
+                <li>
+                    Confirm the production directory and running
+                    containers.
+                </li>
+
+                <li>
+                    Identify the host-side Caddyfile and any mounted
+                    certificate directories with
+                    <code>docker inspect</code>.
+                </li>
+
+                <li>
+                    Record the exact certificate, full-chain and
+                    private-key paths currently referenced by Caddy.
+                    Do not guess filenames.
+                </li>
+
+                <li>
+                    Create server-local backups before changing any
+                    file. Keep private-key backups on the server and
+                    protect them with the same or stricter permissions.
+                </li>
+
+                <li>
+                    Inspect the new certificate validity, subject and
+                    issuer before installation.
+                </li>
+
+                <li>
+                    Confirm that the new certificate and private key
+                    belong to the same key pair.
+                </li>
+            </ol>
+
+
+            <h3>Inspect a new certificate before installation</h3>
+
+            <div class="help-code">openssl x509 -in NEW_CERTIFICATE.pem -noout -subject -issuer -dates -serial</div>
+
+
+            <h3>Verify that certificate and private key match</h3>
+
+            <p>
+                The following two commands should produce the same SHA-256
+                value. Run them only on the server. Do not copy the private
+                key into messages or documentation.
+            </p>
+
+            <div class="help-code">openssl x509 -in NEW_CERTIFICATE.pem -pubkey -noout | openssl pkey -pubin -outform DER | sha256sum
+
+openssl pkey -in NEW_PRIVATE_KEY.key -pubout -outform DER | sha256sum</div>
+
+
+            <h3>Back up current TLS configuration and files</h3>
+
+            <p>
+                Replace the placeholders below only after identifying
+                the real host-side paths. A private-key backup must stay
+                on the server.
+            </p>
+
+            <div class="help-code">cp CADDYFILE_PATH CADDYFILE_PATH.bak_$(date +%F_%H%M%S)
+
+cp CURRENT_CERTIFICATE_PATH CURRENT_CERTIFICATE_PATH.bak_$(date +%F_%H%M%S)
+
+cp CURRENT_FULLCHAIN_PATH CURRENT_FULLCHAIN_PATH.bak_$(date +%F_%H%M%S)
+
+cp CURRENT_PRIVATE_KEY_PATH CURRENT_PRIVATE_KEY_PATH.bak_$(date +%F_%H%M%S)</div>
+
+            <div class="help-warning">
+                The names above are placeholders, not commands to run
+                literally. First inspect the actual mounted paths and
+                active Caddy configuration.
+            </div>
+
+
+            <h3>Install the replacement certificate</h3>
+
+            <p>
+                Replace only the files or Caddy TLS paths confirmed in
+                the active configuration. Preserve appropriate ownership
+                and permissions. In particular, do not make the private
+                key world-readable.
+            </p>
+
+            <div class="help-code">stat CURRENT_CERTIFICATE_PATH
+stat CURRENT_FULLCHAIN_PATH
+stat CURRENT_PRIVATE_KEY_PATH</div>
+
+            <p>
+                After installing the new files, inspect their ownership
+                and permissions again before restarting Caddy.
+            </p>
+
+
+            <h3>Validate Caddy before restart</h3>
+
+            <div class="help-code">docker exec equation-solver-caddy caddy validate --config /etc/caddy/Caddyfile</div>
+
+            <div class="help-warning">
+                Do not restart Caddy when configuration validation fails.
+                Correct the configuration or restore the previous files
+                first.
+            </div>
+
+
+            <h3>Activate and verify the replacement</h3>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml restart caddy
+
+docker logs --tail 100 equation-solver-caddy
+
+curl -I https://abess.hmu.gr
+
+curl -i https://abess.hmu.gr/api/health
+
+openssl s_client -connect abess.hmu.gr:443 -servername abess.hmu.gr &lt;/dev/null 2&gt;/dev/null | openssl x509 -noout -subject -issuer -dates -serial</div>
+
+            <p>
+                Verify that the certificate shown by the public HTTPS
+                endpoint is the intended replacement and that both the
+                main site and API health endpoint continue to respond
+                correctly.
+            </p>
+
+
+            <h3>Certificate rollback</h3>
+
+            <p>
+                If HTTPS fails after a manual replacement, restore the
+                previously verified Caddy configuration and TLS files
+                from their server-local backups, validate the Caddyfile,
+                restart Caddy and repeat the public HTTPS checks.
+            </p>
+
+            <div class="help-code">cp CADDYFILE_BACKUP CADDYFILE_PATH
+
+cp CERTIFICATE_BACKUP CURRENT_CERTIFICATE_PATH
+
+cp FULLCHAIN_BACKUP CURRENT_FULLCHAIN_PATH
+
+cp PRIVATE_KEY_BACKUP CURRENT_PRIVATE_KEY_PATH
+
+docker exec equation-solver-caddy caddy validate --config /etc/caddy/Caddyfile
+
+docker compose -f docker-compose.production.yml restart caddy
+
+docker logs --tail 100 equation-solver-caddy
+
+curl -I https://abess.hmu.gr
+
+curl -i https://abess.hmu.gr/api/health</div>
+
+            <div class="help-warning">
+                The rollback filenames above are placeholders. Use only
+                backups that were created and verified before the failed
+                change.
+            </div>
+
+
+            <h3>Automatic HTTPS renewal troubleshooting</h3>
+
+            <p>
+                When Caddy manages HTTPS automatically, investigate
+                certificate-renewal problems without manually editing
+                Caddy's internal certificate storage.
+            </p>
+
+            <div class="help-code">date
+
+dig A abess.hmu.gr +short
+
+dig AAAA abess.hmu.gr +short
+
+dig CAA abess.hmu.gr +short
+
+docker logs --tail 200 equation-solver-caddy
+
+docker inspect equation-solver-caddy --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'</div>
+
+            <p>
+                Confirm that DNS resolves to the expected server,
+                current CAA policy permits the intended certificate
+                authority, ports 80/443 and the required network path
+                are available, server time is correct and persistent
+                Caddy storage has not been removed.
+            </p>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- DATABASE INSPECTION -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>28. Database Inspection and Data Maintenance</h2>
+
+            <p>
+                The production SQLite database inside the backend
+                container is:
+            </p>
+
+            <div class="help-code">/data/app.db</div>
+
+            <p>
+                Persistent data is held in the production Docker volume.
+            </p>
+
+
+            <h3>Integrity check</h3>
+
+            <div class="help-code">docker exec equation-solver-backend python -c "import sqlite3; c=sqlite3.connect('/data/app.db'); print(c.execute('PRAGMA integrity_check').fetchone()[0]); c.close()"</div>
+
+            <p>
+                <strong>Expected result:</strong>
+            </p>
+
+            <div class="help-code">ok</div>
+
+
+            <h3>List database tables</h3>
+
+            <div class="help-code">docker exec equation-solver-backend python -c "import sqlite3; c=sqlite3.connect('/data/app.db'); print(c.execute(\"SELECT name FROM sqlite_master WHERE type='table' ORDER BY name\").fetchall()); c.close()"</div>
+
+
+            <h3>Inspect Solve History columns</h3>
+
+            <div class="help-code">docker exec equation-solver-backend python -c "import sqlite3; c=sqlite3.connect('/data/app.db'); print(c.execute('PRAGMA table_info(solve_history)').fetchall()); c.close()"</div>
+
+
+            <h3>Count Solve History records</h3>
+
+            <div class="help-code">docker exec equation-solver-backend python -c "import sqlite3; c=sqlite3.connect('/data/app.db'); print(c.execute('SELECT COUNT(*) FROM solve_history').fetchone()[0]); c.close()"</div>
+
+
+            <h3>Inspect recent history safely</h3>
+
+            <div class="help-code">docker exec equation-solver-backend python -c "import sqlite3; c=sqlite3.connect('/data/app.db'); rows=c.execute('SELECT id,equation,method,success,selection_source,request_source,created_at FROM solve_history ORDER BY id DESC LIMIT 10').fetchall(); [print(r) for r in rows]; c.close()"</div>
+
+            <div class="help-warning">
+                Use read-only SELECT and PRAGMA commands for diagnosis.
+                Do not manually UPDATE or DELETE production rows unless
+                there is a deliberate, reviewed maintenance reason and
+                a verified backup already exists.
+            </div>
+
+
+            <h3>Check Docker volume</h3>
+
+            <div class="help-code">docker volume inspect backend_app_data</div>
+
+            <div class="help-warning">
+                Never use <code>docker compose down -v</code> on the
+                production project. The <code>-v</code> option can
+                remove persistent volumes.
+            </div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- REMOTE ADMIN -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+            <h2>29. Remote Administration, Logout and Reboot</h2>
+
+            <h3>SSH</h3>
+
+            <p>
+                Remote terminal administration can be performed through
+                SSH when the server's SSH service and network access are
+                configured.
+            </p>
+
+            <div class="help-code">ssh USER@SERVER_IP_OR_HOSTNAME</div>
+
+            <div class="help-warning">
+                Do not place server passwords or private SSH keys inside
+                this Help page.
+            </div>
+
+
+            <h3>Remote Desktop</h3>
+
+            <p>
+                If graphical remote access is configured on the Linux
+                host, verify the remote-desktop service before attempting
+                to connect.
+            </p>
+
+            <div class="help-code">systemctl status xrdp</div>
+
+            <p>
+                The exact remote desktop address and credentials are
+                infrastructure information and should be managed
+                separately from this public-facing application source.
+            </p>
+
+
+            <h3>Logging out of the Linux desktop or terminal</h3>
+
+            <p>
+                Logging out of the user session does not normally stop
+                running Docker containers. Docker services run under the
+                Docker engine rather than inside the terminal window.
+            </p>
+
+            <p>
+                Verify the state after reconnecting:
+            </p>
+
+            <div class="help-code">docker compose -f docker-compose.production.yml ps</div>
+
+
+            <h3>After a server reboot</h3>
+
+            <div class="help-code">systemctl is-active docker
+
+docker compose -f docker-compose.production.yml ps
+
+curl -i https://abess.hmu.gr/api/health</div>
+
+            <p>
+                If Docker is not running:
+            </p>
+
+            <div class="help-code">sudo systemctl start docker</div>
+
+            <div class="help-warning">
+                Reboot the production host only during intentional
+                maintenance and only when remote access is known to be
+                recoverable.
+            </div>
+
+        </section>
+
+
+        <!-- ===================================== -->
+        <!-- ROLLBACK -->
+        <!-- ===================================== -->
+
+        <section class="help-section">
+
+    <h2>30. Rollback and Recovery</h2>
+
+    <p>
+        Source rollback must use a verified known-good backup or
+        production freeze. Database rollback is a separate operation
+        and must use a verified SQLite backup.
+    </p>
+
+    <h3>Current release freeze</h3>
+
+    <div class="help-code">/home/rosinante/ABESS_LOCAL/backups/production_freeze_20261005</div>
+
+    <div class="help-warning">
+        Never overwrite an existing production freeze.
+        A freeze is a historical recovery point and must remain
+        immutable after verification.
+    </div>
+
+    <p>
+        The previous
+        <code>production_freeze_20261004</code> is also historical
+        and must never be replaced or modified.
+    </p>
+
+    <h3>Rollback procedure</h3>
+
+    <ol>
+        <li>
+            Identify which source or configuration file caused the
+            regression.
+        </li>
+
+        <li>
+            Confirm that the selected production freeze contains the
+            expected known-good copy.
+        </li>
+
+        <li>
+            Back up the currently deployed broken file before
+            replacing it.
+        </li>
+
+        <li>
+            Restore only the affected file or files from the freeze.
+        </li>
+
+        <li>
+            Run Python, nginx or Caddy validation as applicable.
+        </li>
+
+        <li>
+            Rebuild only the affected Docker service whenever
+            possible.
+        </li>
+
+        <li>
+            Run health, security and regression checks again.
+        </li>
+    </ol>
+
+    <h3>Database recovery</h3>
+
+    <p>
+        Do not restore application source backups into
+        <code>/data/app.db</code>.
+        Restore the production database only through the dedicated
+        database procedure using a backup that has passed
+        <code>PRAGMA integrity_check</code>.
+    </p>
+
+    <div class="help-warning">
+        Never use a database restore simply to test whether a backup
+        is valid. Verify the backup separately first.
+    </div>
+
+</section>
+
+<section class="help-section">
+
+    <h2>31. Final Production Verification Checklist</h2>
+
+    <p>
+        After a significant production change, run all checks that
+        are relevant to the affected component.
+    </p>
+
+    <ol>
+        <li>Docker service is active.</li>
+
+        <li>
+            Backend, frontend and Caddy containers are running.
+        </li>
+
+        <li>
+            Modified Python files pass syntax validation.
+        </li>
+
+        <li>
+            nginx configuration passes
+            <code>nginx -t</code>.
+        </li>
+
+        <li>
+            Caddy configuration validates if Caddy was modified.
+        </li>
+
+        <li>
+            Public
+            <code>https://abess.hmu.gr/api/health</code>
+            returns HTTP 200.
+        </li>
+
+        <li>
+            Internal backend
+            <code>/health</code>
+            returns HTTP 200.
+        </li>
+
+        <li>The main website opens through HTTPS.</li>
+
+        <li>
+            Registration, verification, login and password reset work
+            when authentication code or email configuration changed.
+        </li>
+
+        <li>
+            Manual equation solving works when solver code changed.
+        </li>
+
+        <li>
+            Automatic / rAIson solving works when selection or rAIson
+            code changed.
+        </li>
+
+        <li>
+            Successful and failed attempts are recorded correctly in
+            Solve History.
+        </li>
+
+        <li>
+            WEB/API request source and Manual/rAIson selection source
+            are recorded correctly when related code changed.
+        </li>
+
+        <li>
+            Personal API-key authentication works when API-key code
+            changed.
+        </li>
+
+        <li>
+            Admin Dashboard loads statistics, users, Method Usage,
+            Solve History and guest information.
+        </li>
+
+        <li>
+            Admin users can see the
+            <strong>Manual</strong> button.
+        </li>
+
+        <li>
+            Guest and normal non-admin users cannot see the
+            <strong>Manual</strong> button.
+        </li>
+
+        <li>
+            Unauthenticated
+            <code>/api/admin/manual-content</code>
+            returns HTTP 401.
+        </li>
+
+        <li>
+            An authenticated non-admin request to the protected
+            Manual endpoint returns HTTP 403.
+        </li>
+
+        <li>
+            An authenticated administrator can load the complete
+            protected Manual.
+        </li>
+
+        <li>
+            Public requests for frontend backup files return HTTP 404.
+        </li>
+
+        <li>
+            Guest-limit behavior remains correct when guest code or
+            configuration changed.
+        </li>
+
+        <li>
+            Graph rendering works when graph/frontend solver code
+            changed.
+        </li>
+
+        <li>
+            Database integrity check returns
+            <strong>ok</strong>.
+        </li>
+
+        <li>
+            Production logs contain no unexpected repeated errors.
+        </li>
+
+        <li>
+            Browser cache is refreshed after frontend changes.
+        </li>
+    </ol>
+
+    <p>
+        When all checks relevant to the change pass, the production
+        application can be considered ready for normal use.
+    </p>
+
+</section>
+
+<section class="help-section">
+
+            <h2>32. Important Safety Rules</h2>
+
+            <ul>
+                <li>
+                    Never use <code>docker compose down -v</code>
+                    on the production system.
+                </li>
+
+                <li>
+                    Never replace <code>/data/app.db</code>
+                    with <code>backend/app.db</code>.
+                </li>
+
+                <li>
+                    Always create and verify a database backup
+                    before restoring data.
+                </li>
+
+                <li>
+                    Never publish <code>.env</code>.
+                </li>
+
+                <li>
+                    Never expose passwords, JWT tokens,
+                    API keys, SECRET_KEY, or TLS private keys.
+                </li>
+
+                <li>
+                    After source-code changes,
+                    rebuild the appropriate Docker image.
+                </li>
+
+                <li>
+                    After a server reboot,
+                    confirm that all production containers are running.
+                </li>
+            </ul>
+
+        </section>
+
+    </section>
+
+
+    <div class="help-footer">
+        ABESS / Equation Solver — Administrator Operations & Maintenance Manual
+    </div>
+
+</main>
+
+
+<script>
+    const helpLoading =
+        document.getElementById("helpLoading");
+
+    const helpContent =
+        document.getElementById("helpContent");
+
+    const helpAccessError =
+        document.getElementById("helpAccessError");
+
+    const helpAdminEmail =
+        document.getElementById("helpAdminEmail");
+
+    const backToDashboardButton =
+        document.getElementById("backToDashboardButton");
+
+    const helpLogoutButton =
+        document.getElementById("helpLogoutButton");
+
+
+    function clearHelpAuthState() {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("access_mode");
+        localStorage.removeItem("user_email");
+    }
+
+
+    function redirectToSolver() {
+        window.location.href = "./index.html";
+    }
+
+
+    async function verifyHelpAdminAccess() {
+        const token =
+            localStorage.getItem("access_token");
+
+        const accessMode =
+            localStorage.getItem("access_mode");
+
+        if (
+            !token
+            || accessMode !== "registered"
+        ) {
+            redirectToSolver();
+            return;
+        }
+
+        try {
+            const response =
+                await fetch(
+                    "/api/admin/me",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization":
+                                `Bearer ${token}`,
+                            "Accept":
+                                "application/json"
+                        }
+                    }
+                );
+
+            if (response.status === 401) {
+                clearHelpAuthState();
+                redirectToSolver();
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    "ADMIN_ACCESS_DENIED"
+                );
+            }
+
+            const data =
+                await response.json();
+
+            if (
+                !data
+                || !data.success
+                || !data.is_admin
+            ) {
+                throw new Error(
+                    "ADMIN_ACCESS_DENIED"
+                );
+            }
+
+            if (helpAdminEmail) {
+                helpAdminEmail.textContent =
+                    data.email || "Admin";
+            }
+
+            if (helpLoading) {
+                helpLoading.classList.add(
+                    "hidden"
+                );
+            }
+
+            if (helpContent) {
+                helpContent.classList.remove(
+                    "hidden"
+                );
+            }
+
+        } catch (error) {
+            console.error(
+                "Admin Help access check failed.",
+                error
+            );
+
+            if (helpLoading) {
+                helpLoading.classList.add(
+                    "hidden"
+                );
+            }
+
+            if (helpAccessError) {
+                helpAccessError.classList.remove(
+                    "hidden"
+                );
+            }
+        }
+    }
+
+
+    if (backToDashboardButton) {
+        backToDashboardButton.addEventListener(
+            "click",
+            () => {
+                window.location.href =
+                    "./admin.html";
+            }
+        );
+    }
+
+
+    if (helpLogoutButton) {
+        helpLogoutButton.addEventListener(
+            "click",
+            () => {
+                clearHelpAuthState();
+                redirectToSolver();
+            }
+        );
+    }
+
+
+    verifyHelpAdminAccess();
+</script>
+
+</body>
+</html>

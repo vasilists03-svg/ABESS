@@ -1,0 +1,14 @@
+*.bak*
+*.backup*
+**/*.bak*
+**/*.backup*
+
+.vscode
+.vscode/**
+**/.vscode
+**/.vscode/**
+
+.git
+.git/**
+.gitignore
+.DS_Store

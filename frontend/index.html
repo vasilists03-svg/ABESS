@@ -1,0 +1,3846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Equation Solver</title>
+
+    <link
+        rel="stylesheet"
+        href="./assets/css/style.css?v=20261017_140842"
+    >
+
+    <style>
+        .help-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.62);
+            backdrop-filter: blur(4px);
+        }
+
+        .help-modal.hidden {
+            display: none;
+        }
+
+        .help-dialog {
+            width: min(1050px, 100%);
+            max-height: min(90vh, 920px);
+            overflow-y: auto;
+            border: 1px solid #dbe3ef;
+            border-radius: 18px;
+            background: #ffffff;
+            color: #1f2937;
+            box-shadow:
+                0 24px 70px
+                rgba(15, 23, 42, 0.24);
+        }
+
+        .help-header {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px 22px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+
+        .help-header h2 {
+            margin: 0;
+            color: #111827;
+            font-size: 1.35rem;
+        }
+
+        .help-body {
+            padding: 22px;
+        }
+
+        .help-body h3 {
+            margin: 30px 0 10px;
+            color: #111827;
+            font-size: 1.08rem;
+        }
+
+        .help-body h3:first-child {
+            margin-top: 0;
+        }
+
+        .help-body h4 {
+            margin: 20px 0 8px;
+            color: #1f2937;
+        }
+
+        .help-body p,
+        .help-body li {
+            color: #475569;
+            line-height: 1.65;
+        }
+
+        .help-body code {
+            border-radius: 5px;
+            background: #eef2f7;
+            padding: 2px 5px;
+            color: #0f172a;
+            font-family:
+                Consolas,
+                Monaco,
+                "Courier New",
+                monospace;
+        }
+
+        .help-intro {
+            margin-bottom: 18px;
+            border-radius: 12px;
+            background: #f8fafc;
+            padding: 14px 16px;
+        }
+
+        .help-steps {
+            margin: 10px 0 0;
+            padding-left: 24px;
+        }
+
+        .help-note {
+            margin-top: 18px;
+            border-left: 4px solid #2563eb;
+            border-radius: 8px;
+            background: #eff6ff;
+            padding: 13px 15px;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .help-success {
+            margin-top: 18px;
+            border-left: 4px solid #059669;
+            border-radius: 8px;
+            background: #ecfdf5;
+            padding: 13px 15px;
+            color: #065f46;
+            line-height: 1.6;
+        }
+
+        .help-warning {
+            margin-top: 18px;
+            border-left: 4px solid #d97706;
+            border-radius: 8px;
+            background: #fff7ed;
+            padding: 13px 15px;
+            color: #7c2d12;
+            line-height: 1.6;
+        }
+
+        .help-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 12px;
+            border: 1px solid #dbe3ef;
+            border-radius: 12px;
+        }
+
+        .help-table {
+            width: 100%;
+            min-width: 680px;
+            border-collapse: collapse;
+            background: #ffffff;
+        }
+
+        .help-table th,
+        .help-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: top;
+            line-height: 1.45;
+        }
+
+        .help-table th {
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .help-table td {
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+        .help-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .help-table code {
+            white-space: nowrap;
+        }
+
+        .help-example-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    2,
+                    minmax(0, 1fr)
+                );
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .help-example {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            gap: 9px;
+            border: 1px solid #dbe3ef;
+            border-radius: 12px;
+            background: #f8fafc;
+            padding: 13px;
+        }
+
+        .help-example strong {
+            display: block;
+            color: #334155;
+            font-size: 0.9rem;
+        }
+
+        .help-example code {
+            display: block;
+            overflow-x: auto;
+            border-radius: 8px;
+            background: #eef2f7;
+            padding: 10px;
+            color: #0f172a;
+            font-size: 0.83rem;
+            line-height: 1.45;
+            white-space: nowrap;
+        }
+
+        .help-example-description {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.84rem;
+            line-height: 1.45;
+        }
+
+        .help-use-example {
+            align-self: flex-start;
+            margin-top: auto;
+            border: 1px solid #2563eb;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 7px 11px;
+            color: #2563eb;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition:
+                background 0.15s ease,
+                color 0.15s ease;
+        }
+
+        .help-use-example:hover {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .help-result-preview {
+            margin-top: 12px;
+            border: 1px solid #dbe3ef;
+            border-radius: 12px;
+            background: #f8fafc;
+            padding: 14px;
+        }
+
+        .help-result-preview code {
+            display: block;
+            overflow-x: auto;
+            background: transparent;
+            padding: 0;
+            white-space: pre-wrap;
+            line-height: 1.65;
+        }
+
+        .help-small {
+            color: #64748b;
+            font-size: 0.86rem;
+        }
+
+        body.help-modal-open {
+            overflow: hidden;
+        }
+
+        @media (max-width: 720px) {
+            .help-modal {
+                align-items: flex-end;
+                padding: 0;
+            }
+
+            .help-dialog {
+                width: 100%;
+                max-height: 94vh;
+                border-radius: 18px 18px 0 0;
+            }
+
+            .help-example-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .help-header,
+            .help-body {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .help-table {
+                min-width: 620px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="page">
+
+    <section
+        id="authScreen"
+        class="auth-card"
+    >
+
+        <h1>
+            Equation Solver
+        </h1>
+
+        <p class="subtitle">
+            Sign in for full access or continue as a guest
+            with 3 free solves.
+        </p>
+
+        <div class="form-group">
+
+            <label for="authEmail">
+                Email
+            </label>
+
+            <input
+                type="email"
+                id="authEmail"
+                placeholder="example@gmail.com"
+                autocomplete="email"
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="authPassword">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="authPassword"
+                placeholder="Enter password"
+                autocomplete="current-password"
+            >
+
+        </div>
+
+        <div class="auth-actions">
+
+            <button
+                type="button"
+                id="loginButton"
+                class="btn-primary"
+            >
+                Login
+            </button>
+
+            <button
+                type="button"
+                id="registerButton"
+                class="btn-secondary auth-secondary"
+            >
+                Register
+            </button>
+
+        </div>
+
+        <button
+            type="button"
+            id="guestButton"
+            class="btn-guest"
+        >
+            Continue as Guest
+        </button>
+
+        <div
+            id="authMessage"
+            class="auth-message"
+        ></div>
+
+    </section>
+
+
+    <section
+        id="solverScreen"
+        class="solver-card hidden"
+    >
+
+        <div class="top-bar">
+
+            <div>
+
+                <h1>
+                    Equation Solver
+                </h1>
+
+                <p class="subtitle">
+                    Enter an equation, select a method
+                    and solve it or draw its graph.
+                </p>
+
+            </div>
+
+            <div class="user-panel">
+
+                <span id="userStatus">
+                    Guest mode
+                </span>
+
+                <div class="user-actions">
+
+                    <button
+                        type="button"
+                        id="historyButton"
+                        class="btn-secondary"
+                    >
+                        History
+                    </button>
+
+                    <button
+                        type="button"
+                        id="adminDashboardButton"
+                        class="btn-secondary hidden"
+                    >
+                        Admin Dashboard
+                    </button>
+
+                    <button
+                        type="button"
+                        id="adminManualButton"
+                        class="btn-secondary hidden"
+                    >
+                        Manual
+                    </button>
+
+                    <button
+                        type="button"
+                        id="helpButton"
+                        class="btn-secondary"
+                    >
+                        Help
+                    </button>
+
+                    <button
+                        type="button"
+                        id="aboutButton"
+                        class="btn-secondary"
+                        onclick="window.location.href='./about.html'"
+                    >
+                        About
+                    </button>
+
+                    <button
+                        type="button"
+                        id="logoutButton"
+                        class="btn-secondary"
+                    >
+                        Logout
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="historyBox"
+            class="history-box hidden"
+        >
+
+            <div class="history-header">
+
+                <h3>
+                    My History
+                </h3>
+
+                <button
+                    type="button"
+                    id="closeHistoryButton"
+                    class="btn-secondary"
+                >
+                    Close
+                </button>
+
+            </div>
+
+            <div
+                id="historyContent"
+                class="history-content"
+            ></div>
+
+        </div>
+
+
+        <div class="solver-layout">
+
+            <section class="solver-controls">
+
+                <div class="panel-heading">
+
+                    <h2>
+                        Equation Settings
+                    </h2>
+
+                    <p>
+                        Enter the equation, choose a method,
+                        and optionally select criteria or
+                        initial values.
+                    </p>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="equation">
+                        Equation
+                    </label>
+
+                    <input
+                        type="text"
+                        id="equation"
+                        placeholder="e.g. x² - 4 = 0"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="method">
+                        Method
+                    </label>
+
+                    <select id="method">
+
+                        <option value="bisection">
+                            Bisection Method
+                        </option>
+
+                        <option value="newton">
+                            Newton-Raphson Method
+                        </option>
+
+                        <option value="secant">
+                            Secant Method
+                        </option>
+
+                        <option value="fzero">
+                            fzero
+                        </option>
+
+                        <option value="itp">
+                            ITP Method
+                        </option>
+
+                        <option value="muller">
+                            Muller Method
+                        </option>
+
+                        <option value="solve">
+                            Symbolic Solve
+                        </option>
+
+                        <option value="roots">
+                            Polynomial Roots
+                        </option>
+
+                        <option value="integer_exhaustive_scan">
+                            Integer Exhaustive Scan
+                        </option>
+
+                        <option value="automatic">
+                            Automatic / rAIson
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="criteriaBox"
+                    class="criteria-box hidden"
+                >
+
+                    <button
+                        type="button"
+                        id="criteriaToggle"
+                        class="criteria-toggle"
+                        aria-expanded="false"
+                        aria-controls="criteriaDropdown"
+                    >
+
+                        <span class="criteria-toggle-main">
+
+                            <span class="criteria-toggle-title">
+                                rAIson Criteria
+                            </span>
+
+                            <span
+                                id="criteriaSummary"
+                                class="criteria-summary"
+                            >
+                                No criteria selected
+                            </span>
+
+                        </span>
+
+                        <span
+                            class="criteria-chevron"
+                            aria-hidden="true"
+                        >
+                            ▼
+                        </span>
+
+                    </button>
+
+
+                    <div
+                        id="criteriaDropdown"
+                        class="criteria-dropdown hidden"
+                    >
+
+                        <p class="criteria-description">
+                            You can select none, one, or multiple criteria.
+                            rAIson uses the selected criteria to recommend
+                            a suitable solving method.
+                        </p>
+
+
+                        <div
+                            id="criteriaMenu"
+                            class="criteria-menu criteria-grid"
+                        >
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="analyticalSolution"
+                                    value="seek_analytical_solution"
+                                >
+                                I seek an analytical solution
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="functionPolynomial"
+                                    value="function_is_polynomial"
+                                >
+                                Function is polynomial
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="seekComplexRoot"
+                                    value="seek_complex_root"
+                                >
+                                I seek a complex root
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="derivativeAvailable"
+                                    value="derivative_is_available"
+                                >
+                                Derivative is available
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="goodInitialApproximation"
+                                    value="good_initial_approximation"
+                                >
+                                I have a good initial approximation
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="integerThreshold"
+                                    value="integer_valued_threshold_problem"
+                                >
+                                Integer-valued threshold problem
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="oppositeSignsInterval"
+                                    value="opposite_signs_interval"
+                                >
+                                f(a) * f(b) &lt; 0
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="continuousExtension"
+                                    value="continuous_extension_available"
+                                >
+                                Continuous extension is available
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="intervalLengthLarge"
+                                    value="length_interval_large"
+                                >
+                                Length of [a,b] &gt;&gt; 1
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="steepOrNoGradient"
+                                    value="steep_gradient_or_no_gradient_near_root"
+                                >
+                                Steep gradient or no gradient near root
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="inflectionNearSolution"
+                                    value="inflection_points_near_solution"
+                                >
+                                Inflection points near solution
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="extremumNearSolution"
+                                    value="extremum_points_near_solution"
+                                >
+                                Extremum points near solution
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="smoothNearRoot"
+                                    value="function_behaves_smoothly_near_root"
+                                >
+                                Function behaves smoothly near root
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="knownMultiplicity"
+                                    value="known_k_multiplicity_of_root"
+                                >
+                                Known k-multiplicity of root
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="monotonicFunction"
+                                    value="function_is_monotonic"
+                                >
+                                Function is monotonic
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="needSimplicity"
+                                    value="need_simplicity"
+                                >
+                                I need simplicity
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="needRobustness"
+                                    value="need_robustness"
+                                >
+                                I need robustness
+                            </label>
+
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    id="needSpeed"
+                                    value="need_speed"
+                                >
+                                I need speed
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="intervalInputs"
+                    class="form-row"
+                >
+
+                    <div class="form-group">
+
+                        <label for="aValue">
+                            a
+                        </label>
+
+                        <input
+                            type="number"
+                            id="aValue"
+                            step="any"
+                            placeholder="e.g. -2"
+                        >
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="bValue">
+                            b
+                        </label>
+
+                        <input
+                            type="number"
+                            id="bValue"
+                            step="any"
+                            placeholder="e.g. 2"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="initialInputs"
+                    class="form-row"
+                >
+
+                    <div
+                        id="x0Input"
+                        class="form-group"
+                    >
+
+                        <label for="x0Value">
+                            x0
+                        </label>
+
+                        <input
+                            type="number"
+                            id="x0Value"
+                            step="any"
+                            placeholder="e.g. 1"
+                        >
+
+                    </div>
+
+
+                    <div
+                        id="x1Input"
+                        class="form-group"
+                    >
+
+                        <label for="x1Value">
+                            x1
+                        </label>
+
+                        <input
+                            type="number"
+                            id="x1Value"
+                            step="any"
+                            placeholder="e.g. 2"
+                        >
+
+                    </div>
+
+                    <div id="x2Input" class="form-group">
+                        <label for="x2Value">x2</label>
+                        <input
+                            type="number"
+                            id="x2Value"
+                            step="any"
+                            placeholder="e.g. 3"
+                        >
+                    </div>
+
+                </div>
+
+                <p
+                    id="autoParametersHint"
+                    style="display:none; font-size:0.85rem; opacity:0.8; margin:8px 0 14px;"
+                ></p>
+
+                <div class="solve-actions">
+
+                    <button
+                        type="button"
+                        id="solveButton"
+                        class="btn-primary"
+                    >
+                        Solve
+                    </button>
+
+                    <button
+                        type="button"
+                        id="drawGraphButton"
+                        class="btn-secondary"
+                    >
+                        Draw Graph
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <section class="solver-results">
+
+                <div class="panel-heading">
+                    <h2>
+                        Results
+                    </h2>
+                </div>
+
+
+                <div
+                    id="result"
+                    class="result-box"
+                >
+
+                    <div class="result-placeholder">
+
+                        <strong>
+                            No result yet
+                        </strong>
+
+                        <p>
+                            Click Solve to solve the equation
+                            or Draw Graph to display the graph.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="graphBox"
+                    class="graph-box hidden"
+                >
+
+                    <div class="graph-header">
+
+                        <h3>
+                            Function Graph
+                        </h3>
+
+                        <button
+                            type="button"
+                            id="resetZoomButton"
+                            class="btn-secondary"
+                        >
+                            Reset Zoom
+                        </button>
+
+                    </div>
+
+
+                    <p class="graph-help">
+                        Use the mouse wheel to zoom.
+                        Drag the graph to move.
+                        Double-click the curve to select a and b.
+                    </p>
+
+
+                    <!-- ABESS_FULL_EQUATION_TITLE_V1 -->
+                    <div
+                        id="graphEquationDisplay"
+                        class="graph-equation-display"
+                        aria-label="Equation being plotted"
+                    ></div>
+
+                    <div id="functionChart"></div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<div
+    id="helpModal"
+    class="help-modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="helpTitle"
+>
+
+    <div class="help-dialog">
+
+        <div class="help-header">
+
+            <h2 id="helpTitle">
+                Equation Solver Help
+            </h2>
+
+            <button
+                type="button"
+                id="closeHelpButton"
+                class="btn-secondary"
+                aria-label="Close help"
+            >
+                Close
+            </button>
+
+        </div>
+
+
+        <div class="help-body">
+
+            <div class="help-intro">
+
+                <strong>
+                    You do not need prior Python or SymPy programming knowledge.
+                </strong>
+
+                <p>
+                    The solver accepts common mathematical notation,
+                    Unicode mathematical symbols and several
+                    MATLAB-style scalar operators.
+                </p>
+
+            </div>
+
+
+            <div
+                id="guestHelpNotice"
+                class="help-warning hidden"
+            >
+                <strong>Guest mode</strong>
+
+                <p>
+                    You can use the solver for up to
+                    <strong>3 free solves</strong>.
+                    Sign in or create and verify an account
+                    to access Solve History,
+                    My Information and your personal
+                    API key / API access.
+                </p>
+
+                <p>
+                    Password recovery is available
+                    for registered accounts.
+                </p>
+            </div>
+
+
+            <h3>
+                1. How the application works
+            </h3>
+
+            <p>
+                Enter a scalar equation whose free unknown is
+                <strong>x</strong>.
+                You can manually select a solving method or choose
+                <strong>Automatic / rAIson</strong>.
+            </p>
+
+            <p>
+                In Automatic / rAIson mode, the selected problem
+                criteria are sent to rAIson.
+                rAIson recommends a solving method and Python
+                executes the selected method.
+            </p>
+
+            <p>
+                When available, the Results area also displays
+                the explanation returned by rAIson for its
+                recommendation. This helps the user understand
+                why a particular method was selected from the
+                supplied criteria.
+            </p>
+
+            <div class="help-note">
+                If the Automatic / rAIson flow has no usable
+                problem context, the application may use an
+                internal general fallback criterion.
+                This internal fallback is handled automatically
+                and is not a user-selectable criterion.
+            </div>
+
+            <div class="help-note">
+                Selecting a criterion does not manually force a method.
+                The criterion provides information to rAIson,
+                while the final method recommendation remains
+                the responsibility of rAIson.
+            </div>
+
+
+            <h3>
+                2. Basic use
+            </h3>
+
+            <ol class="help-steps">
+
+                <li>
+                    Enter an equation.
+                </li>
+
+                <li>
+                    Select a solving method or choose
+                    <strong>Automatic / rAIson</strong>.
+                </li>
+
+                <li>
+                    If Automatic / rAIson is selected,
+                    choose any criteria that describe the problem.
+                </li>
+
+                <li>
+                    For numerical methods, initial values are optional.
+                    Leave the relevant fields empty to let the application attempt to estimate them. When entering an interval or multiple starting points manually, complete all related fields.
+                </li>
+
+                <li>
+                    Press <strong>Solve</strong>.
+                </li>
+
+                <li>
+                    Press <strong>Draw Graph</strong>
+                    to inspect the function graph.
+                </li>
+
+            </ol>
+
+            <div class="help-success">
+                Both equation and expression forms are accepted.
+                For example,
+                <code>x² - 4 = 0</code>
+                and
+                <code>x² - 4</code>
+                are equivalent.
+                If no equals sign is provided, the expression
+                is interpreted as being equal to zero.
+            </div>
+
+
+            <h3>
+                3. Supported mathematical notation
+            </h3>
+
+            <div class="help-table-wrap">
+
+                <table class="help-table">
+
+                    <thead>
+                        <tr>
+                            <th>
+                                Meaning
+                            </th>
+
+                            <th>
+                                Accepted notation
+                            </th>
+
+                            <th>
+                                Example
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>
+                                Variable
+                            </td>
+
+                            <td>
+                                <code>x</code>
+                            </td>
+
+                            <td>
+                                <code>x + 2 = 0</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Powers
+                            </td>
+
+                            <td>
+                                <code>x^2</code>,
+                                <code>x**2</code>,
+                                <code>x²</code>,
+                                <code>x³</code>
+                            </td>
+
+                            <td>
+                                <code>x² - 4 = 0</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                MATLAB-style power
+                            </td>
+
+                            <td>
+                                <code>x.^2</code>
+                            </td>
+
+                            <td>
+                                <code>x.^2 - 4 = 0</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Multiplication
+                            </td>
+
+                            <td>
+                                <code>*</code>,
+                                <code>.*</code>,
+                                <code>×</code>,
+                                <code>·</code>,
+                                or implicit multiplication
+                            </td>
+
+                            <td>
+                                <code>2*x</code>,
+                                <code>2x</code>,
+                                <code>3sin(x)</code>,
+                                <code>2π</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Division
+                            </td>
+
+                            <td>
+                                <code>/</code>,
+                                <code>./</code>,
+                                <code>÷</code>
+                            </td>
+
+                            <td>
+                                <code>x/2 = 4</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Mathematical π
+                            </td>
+
+                            <td>
+                                <code>pi</code>,
+                                <code>π</code>
+                            </td>
+
+                            <td>
+                                <code>2π*x = 1</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Euler's number
+                            </td>
+
+                            <td>
+                                <code>e</code>,
+                                <code>E</code>
+                            </td>
+
+                            <td>
+                                <code>e^x = 5</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Imaginary unit
+                            </td>
+
+                            <td>
+                                <code>i</code>,
+                                <code>j</code>,
+                                <code>I</code>
+                            </td>
+
+                            <td>
+                                <code>x² + 1 = 0</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Infinity
+                            </td>
+
+                            <td>
+                                <code>inf</code>,
+                                <code>infinity</code>,
+                                <code>∞</code>
+                            </td>
+
+                            <td>
+                                Can be used where an infinite
+                                symbolic bound is meaningful.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Square root
+                            </td>
+
+                            <td>
+                                <code>sqrt(x)</code>,
+                                <code>√x</code>,
+                                <code>√(x+1)</code>
+                            </td>
+
+                            <td>
+                                <code>√x = 3</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Absolute value
+                            </td>
+
+                            <td>
+                                <code>abs(x)</code>,
+                                <code>|x|</code>
+                            </td>
+
+                            <td>
+                                <code>|x| = 2</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Natural logarithm
+                            </td>
+
+                            <td>
+                                <code>ln(x)</code>,
+                                <code>log(x)</code>
+                            </td>
+
+                            <td>
+                                <code>ln(x) = 2</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Base-10 logarithm
+                            </td>
+
+                            <td>
+                                <code>log10(x)</code>
+                            </td>
+
+                            <td>
+                                <code>log10(x) = 2</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Exponential
+                            </td>
+
+                            <td>
+                                <code>exp(x)</code>,
+                                <code>e^x</code>
+                            </td>
+
+                            <td>
+                                <code>exp(x) - 5 = 0</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Trigonometric functions
+                            </td>
+
+                            <td>
+                                <code>sin(x)</code>,
+                                <code>cos(x)</code>,
+                                <code>tan(x)</code>
+                            </td>
+
+                            <td>
+                                <code>sin(x) - 0.5 = 0</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Inverse trigonometric functions
+                            </td>
+
+                            <td>
+                                <code>asin(x)</code>,
+                                <code>acos(x)</code>,
+                                <code>atan(x)</code>
+                            </td>
+
+                            <td>
+                                <code>asin(x) = pi/6</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Hyperbolic functions
+                            </td>
+
+                            <td>
+                                <code>sinh(x)</code>,
+                                <code>cosh(x)</code>,
+                                <code>tanh(x)</code>
+                            </td>
+
+                            <td>
+                                <code>sinh(x) = 1</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Factorial
+                            </td>
+
+                            <td>
+                                <code>factorial(x)</code>,
+                                <code>x!</code>
+                            </td>
+
+                            <td>
+                                <code>factorial(x) = 120</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Gamma function
+                            </td>
+
+                            <td>
+                                <code>gamma(x)</code>,
+                                <code>Gamma(x)</code>
+                            </td>
+
+                            <td>
+                                <code>gamma(x) = 2</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Incomplete gamma functions
+                            </td>
+
+                            <td>
+                                <code>lowergamma(a,x)</code>,
+                                <code>uppergamma(a,x)</code>
+                            </td>
+
+                            <td>
+                                <code>lowergamma(2,x) = 0.5</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Regularized lower incomplete gamma
+                            </td>
+
+                            <td>
+                                <code>gammainc(a,x)</code>
+                            </td>
+
+                            <td>
+                                <code>gammainc(2,x) = 0.5</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Floor / Ceiling
+                            </td>
+
+                            <td>
+                                <code>floor(x)</code>,
+                                <code>ceil(x)</code>,
+                                <code>ceiling(x)</code>
+                            </td>
+
+                            <td>
+                                <code>ceil(x) = 3</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Finite sum
+                            </td>
+
+                            <td>
+                                <code>Sum(...)</code>,
+                                <code>sum(...)</code>
+                            </td>
+
+                            <td>
+                                <code>Sum(n*x, (n,1,5)) = 15</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Finite product
+                            </td>
+
+                            <td>
+                                <code>Product(...)</code>,
+                                <code>product(...)</code>
+                            </td>
+
+                            <td>
+                                <code>Product(1+x/(n+1), (n,0,5)) = 7</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Error function
+                            </td>
+
+                            <td>
+                                <code>erf(x)</code>
+                            </td>
+
+                            <td>
+                                <code>erf(x) = 0.5</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Minimum / Maximum
+                            </td>
+
+                            <td>
+                                <code>min(...)</code>,
+                                <code>max(...)</code>,
+                                <code>Min(...)</code>,
+                                <code>Max(...)</code>
+                            </td>
+
+                            <td>
+                                <code>max(x,2) = 5</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Definite integral
+                            </td>
+
+                            <td>
+                                <code>Integral(...)</code>,
+                                <code>integrate(...)</code>
+                            </td>
+
+                            <td>
+                                <code>Integral(t**2, (t,0,x)) = 9</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Derivative
+                            </td>
+
+                            <td>
+                                <code>Derivative(...)</code>,
+                                <code>diff(...)</code>
+                            </td>
+
+                            <td>
+                                <code>Derivative(sin(x),x) = 0.5</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Scientific notation
+                            </td>
+
+                            <td>
+                                Standard
+                                <code>e</code>
+                                notation
+                            </td>
+
+                            <td>
+                                <code>1e-8</code>,
+                                <code>15.8e-6</code>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Standard minus
+                            </td>
+
+                            <td>
+                                <code>-</code>
+                                and Unicode
+                                <code>−</code>
+                            </td>
+
+                            <td>
+                                <code>x − 5 = 0</code>
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <h3>
+                4. Solving methods and initial values
+            </h3>
+
+            <div class="help-table-wrap">
+
+                <table class="help-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>
+                                Method
+                            </th>
+
+                            <th>
+                                Optional manual values
+                            </th>
+
+                            <th>
+                                Notes
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>
+                                Bisection Method
+                            </td>
+
+                            <td>
+                                <code>a</code>,
+                                <code>b</code>
+                            </td>
+
+                            <td>
+                                Enter a sign-change interval or leave both fields empty for automatic estimation.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Newton-Raphson Method
+                            </td>
+
+                            <td>
+                                <code>x0</code>
+                            </td>
+
+                            <td>
+                                Enter x0 or leave it empty for automatic estimation.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Secant Method
+                            </td>
+
+                            <td>
+                                <code>x0</code>,
+                                <code>x1</code>
+                            </td>
+
+                            <td>
+                                Enter both starting values or leave both empty for automatic estimation.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                fzero
+                            </td>
+
+                            <td>
+                                <code>a</code>,
+                                <code>b</code>
+                            </td>
+
+                            <td>
+                                Enter a sign-change interval or leave both fields empty for automatic estimation.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                ITP Method
+                            </td>
+
+                            <td>
+                                <code>a</code>,
+                                <code>b</code>
+                            </td>
+
+                            <td>
+                                Uses a sign-change interval, which ABESS can attempt to find automatically.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Muller Method
+                            </td>
+
+                            <td>
+                                <code>x0</code>, <code>x1</code>, <code>x2</code>
+                            </td>
+
+                            <td>
+                                Enter all three starting values or leave them blank for automatic estimation. Complex roots are supported.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Symbolic Solve
+                            </td>
+
+                            <td>
+                                None
+                            </td>
+
+                            <td>
+                                Attempts to obtain exact
+                                symbolic solutions.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Polynomial Roots
+                            </td>
+
+                            <td>
+                                None
+                            </td>
+
+                            <td>
+                                Intended for polynomial equations.
+                                Multiple roots can be returned.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Integer Exhaustive Scan
+                            </td>
+
+                            <td>
+                                Optional
+                                <code>a</code>,
+                                <code>b</code>
+                            </td>
+
+                            <td>
+                                Searches integer values within the selected or default range.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Automatic / rAIson
+                            </td>
+
+                            <td>
+                                Criteria and optional
+                                numerical values
+                            </td>
+
+                            <td>
+                                rAIson selects the method.
+                                Python then executes
+                                that selected method.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <h3>
+                5. Equation examples
+            </h3>
+
+            <p>
+                Press <strong>Use Example</strong>
+                to place an example directly into the solver.
+                When useful, the recommended method and its
+                optional numerical starting values are also selected.
+            </p>
+
+
+            <div class="help-example-grid">
+
+                <div class="help-example">
+
+                    <strong>
+                        Polynomial
+                    </strong>
+
+                    <code>
+                        x² - 5x + 6 = 0
+                    </code>
+
+                    <p class="help-example-description">
+                        Demonstrates polynomial notation
+                        and implicit multiplication.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="x² - 5x + 6 = 0"
+                        data-method="roots"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Bisection
+                    </strong>
+
+                    <code>
+                        x² - 4 = 0
+                    </code>
+
+                    <p class="help-example-description">
+                        Uses the interval [0,3].
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="x² - 4 = 0"
+                        data-method="bisection"
+                        data-a="0"
+                        data-b="3"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Exponential
+                    </strong>
+
+                    <code>
+                        e^x - 5 = 0
+                    </code>
+
+                    <p class="help-example-description">
+                        Demonstrates Euler's number
+                        and exponential notation.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="e^x - 5 = 0"
+                        data-method="newton"
+                        data-x0="1"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Natural logarithm
+                    </strong>
+
+                    <code>
+                        ln(x) - 2 = 0
+                    </code>
+
+                    <p class="help-example-description">
+                        The solver accepts
+                        both ln(x) and log(x).
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="ln(x) - 2 = 0"
+                        data-method="newton"
+                        data-x0="2"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Square root
+                    </strong>
+
+                    <code>
+                        √x - 3 = 0
+                    </code>
+
+                    <p class="help-example-description">
+                        Demonstrates natural
+                        mathematical square-root notation.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="√x - 3 = 0"
+                        data-method="fzero"
+                        data-a="0"
+                        data-b="10"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Absolute value
+                    </strong>
+
+                    <code>
+                        |x| - 2 = 0
+                    </code>
+
+                    <p class="help-example-description">
+                        Demonstrates vertical-bar
+                        absolute-value notation.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="|x| - 2 = 0"
+                        data-method="bisection"
+                        data-a="-3"
+                        data-b="0"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Complex roots
+                    </strong>
+
+                    <code>
+                        x² + 1 = 0
+                    </code>
+
+                    <p class="help-example-description">
+                        A simple equation with
+                        complex solutions.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="x² + 1 = 0"
+                        data-method="muller"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        MATLAB-style operators
+                    </strong>
+
+                    <code>
+                        x.^2 - 4 = 0
+                    </code>
+
+                    <p class="help-example-description">
+                        Scalar MATLAB-style power notation
+                        is normalized automatically.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="x.^2 - 4 = 0"
+                        data-method="roots"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Definite integral
+                    </strong>
+
+                    <code>
+                        Integral(t**2, (t, 0, x)) = 9
+                    </code>
+
+                    <p class="help-example-description">
+                        The bound variable t is allowed
+                        inside the integral.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="Integral(t**2, (t, 0, x)) = 9"
+                        data-method="solve"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Derivative
+                    </strong>
+
+                    <code>
+                        Derivative(sin(x), x) = 0.5
+                    </code>
+
+                    <p class="help-example-description">
+                        Symbolic derivatives can appear
+                        directly inside an equation.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="Derivative(sin(x), x) = 0.5"
+                        data-method="solve"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Integer search
+                    </strong>
+
+                    <code>
+                        x - 7 = 0
+                    </code>
+
+                    <p class="help-example-description">
+                        Searches integer values
+                        between 0 and 10.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="x - 7 = 0"
+                        data-method="integer_exhaustive_scan"
+                        data-a="0"
+                        data-b="10"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Scientific equation
+                    </strong>
+
+                    <code>
+                        (1-exp(-(0.00008*pi)*x^2)*(1+(0.00008*pi)*x^2))^8000-0.99
+                    </code>
+
+                    <p class="help-example-description">
+                        Example of a larger equation
+                        using pi, exp and powers.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="(1-exp(-(0.00008*pi)*x^2)*(1+(0.00008*pi)*x^2))^8000-0.99"
+                        data-method="fzero"
+                        data-a="232.5131"
+                        data-b="328.8232"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <h4>
+                Advanced mathematical examples
+            </h4>
+
+            <p>
+                The following examples demonstrate some of the
+                more advanced mathematical expressions supported
+                by the same general equation solver.
+            </p>
+
+            <div class="help-example-grid">
+
+                <div class="help-example">
+
+                    <strong>
+                        Regularized incomplete gamma
+                    </strong>
+
+                    <code>
+                        gammainc(2,x) = 0.5
+                    </code>
+
+                    <p class="help-example-description">
+                        Demonstrates the regularized lower
+                        incomplete gamma function.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="gammainc(2,x) = 0.5"
+                        data-method="fzero"
+                        data-a="0"
+                        data-b="5"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Integral equation
+                    </strong>
+
+                    <code>
+                        Integral(exp(-t**2), (t,0,x)) = 0.5
+                    </code>
+
+                    <p class="help-example-description">
+                        Combines a definite integral,
+                        an exponential function and a bound variable.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="Integral(exp(-t**2), (t,0,x)) = 0.5"
+                        data-method="fzero"
+                        data-a="0"
+                        data-b="2"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Finite sum
+                    </strong>
+
+                    <code>
+                        Sum(n*x, (n,1,5)) = 15
+                    </code>
+
+                    <p class="help-example-description">
+                        Demonstrates a finite symbolic sum
+                        with n used as a bound variable.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="Sum(n*x, (n,1,5)) = 15"
+                        data-method="solve"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Finite product
+                    </strong>
+
+                    <code>
+                        Product(1+x/(n+1), (n,0,3)) = 5
+                    </code>
+
+                    <p class="help-example-description">
+                        Demonstrates a finite product
+                        evaluated as part of an equation.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="Product(1+x/(n+1), (n,0,3)) = 5"
+                        data-method="fzero"
+                        data-a="0"
+                        data-b="2"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Derivative equation
+                    </strong>
+
+                    <code>
+                        Derivative(x**3 - 2*x, x) = 10
+                    </code>
+
+                    <p class="help-example-description">
+                        Demonstrates a symbolic derivative
+                        appearing directly inside an equation.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="Derivative(x**3 - 2*x, x) = 10"
+                        data-method="solve"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Combined scientific expression
+                    </strong>
+
+                    <code>
+                        Product(1-gammainc(n+1,pi*x^2),(n,0,5))-0.1
+                    </code>
+
+                    <p class="help-example-description">
+                        Combines a finite product, the regularized
+                        incomplete gamma function, pi and powers.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="help-use-example"
+                        data-example="Product(1-gammainc(n+1,pi*x^2),(n,0,5))-0.1"
+                        data-method="fzero"
+                        data-a="0"
+                        data-b="1"
+                    >
+                        Use Example
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ABESS SCIENTIFIC PAPER EQUATIONS -->
+
+            <h3>
+                6. Scientific Paper Equations
+            </h3>
+
+            <p>
+                The following equations are based on
+                scientific research models and were
+                adapted for use in ABESS.
+                Select <strong>Use Example</strong>
+                to load an equation and configure
+                <strong>Automatic / rAIson</strong>.
+            </p>
+
+            <p>
+                The supplied intervals satisfy
+                f(a) * f(b) &lt; 0.
+                Press Solve to request automatic
+                method selection and equation solving.
+            </p>
+
+            <div class="help-example-grid">
+
+                <div class="help-example">
+                    <strong>Network Connectivity (2-Connectivity)</strong>
+
+                    <code style="display:block; white-space:normal; overflow-wrap:anywhere;">(1-exp(-(0.00008*pi)*x^2)*(1+(0.00008*pi)*x^2))^8000-0.99</code>
+
+                    <p class="help-example-description">
+                        Determines the communication radius required to achieve a target network connectivity probability of 0.99.
+                    </p>
+
+                    <p class="help-example-description">
+                        <em>Paper model with its numerical parameters substituted into the equation.</em>
+                    </p>
+
+                    <div class="help-paper-actions">
+                        <button
+                            type="button"
+                            class="help-use-example"
+                            data-example="(1-exp(-(0.00008*pi)*x^2)*(1+(0.00008*pi)*x^2))^8000-0.99"
+                            data-method="automatic"
+                            data-a="232.5131"
+                            data-b="328.8232"
+                            data-clear-criteria="true"
+                            data-criterion="oppositeSignsInterval"
+                        >
+                            Use Example
+                        </button>
+
+                        <a
+                            class="help-paper-link"
+                            href="https://www.mdpi.com/1999-4893/19/6/457"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="View scientific paper for Network Connectivity (2-Connectivity)"
+                        >
+                            View Paper ↗
+                        </a>
+                    </div>
+                </div>
+
+
+                <div class="help-example">
+                    <strong>Wireless Sensor Network Coverage</strong>
+
+                    <code style="display:block; white-space:normal; overflow-wrap:anywhere;">1-(0.9971725666117692)^x-x*0.0028274333882308137*(0.9886902664470768)^(x-1)-x*0.0028274333882308137*(0.9921460183660255)^(x-1)+x*0.0028274333882308137*(0.9836637182013331)^(x-1)-0.5*x*(x-1)*(0.0028274333882308137)^2*(0.9836637182013331)^(x-2)-0.99</code>
+
+                    <p class="help-example-description">
+                        Determines the number of sensors associated with a target coverage probability of 0.99.
+                    </p>
+
+                    <p class="help-example-description">
+                        <em>The numerical parameter values are substituted into the paper&#x27;s probability model.</em>
+                    </p>
+
+                    <div class="help-paper-actions">
+                        <button
+                            type="button"
+                            class="help-use-example"
+                            data-example="1-(0.9971725666117692)^x-x*0.0028274333882308137*(0.9886902664470768)^(x-1)-x*0.0028274333882308137*(0.9921460183660255)^(x-1)+x*0.0028274333882308137*(0.9836637182013331)^(x-1)-0.5*x*(x-1)*(0.0028274333882308137)^2*(0.9836637182013331)^(x-2)-0.99"
+                            data-method="automatic"
+                            data-a="1500"
+                            data-b="2000"
+                            data-clear-criteria="true"
+                            data-criterion="oppositeSignsInterval"
+                        >
+                            Use Example
+                        </button>
+
+                        <a
+                            class="help-paper-link"
+                            href="https://www.mdpi.com/1999-4893/19/6/457"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="View scientific paper for Wireless Sensor Network Coverage"
+                        >
+                            View Paper ↗
+                        </a>
+                    </div>
+                </div>
+
+
+                <div class="help-example">
+                    <strong>Power Outage / RF Energy Harvesting</strong>
+
+                    <code style="display:block; white-space:normal; overflow-wrap:anywhere;">Product(1-gammainc(n+1,pi*x*(2.746818413542654)^2),(n,0,50))-0.1</code>
+
+                    <p class="help-example-description">
+                        Solves a probability-based RF energy harvesting model for the target value 0.1.
+                    </p>
+
+                    <p class="help-example-description">
+                        <em>Numerical adaptation: the original infinite product is truncated to 51 terms (n=0..50). This is not the unmodified infinite product.</em>
+                    </p>
+
+                    <div class="help-paper-actions">
+                        <button
+                            type="button"
+                            class="help-use-example"
+                            data-example="Product(1-gammainc(n+1,pi*x*(2.746818413542654)^2),(n,0,50))-0.1"
+                            data-method="automatic"
+                            data-a="0.018984656383699665"
+                            data-b="0.09714174841049131"
+                            data-clear-criteria="true"
+                            data-criterion="oppositeSignsInterval"
+                        >
+                            Use Example
+                        </button>
+
+                        <a
+                            class="help-paper-link"
+                            href="https://www.mdpi.com/1999-4893/19/6/457"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="View scientific paper for Power Outage / RF Energy Harvesting"
+                        >
+                            View Paper ↗
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+<h3>
+                7. Analytical solution example
+            </h3>
+
+            <p>
+                If the user selects
+                <strong>Automatic / rAIson</strong>
+                and the criterion
+                <strong>I seek an analytical solution</strong>,
+                that information is sent to rAIson.
+            </p>
+
+            <p>
+                If rAIson recommends a symbolic method,
+                the application can display the exact
+                mathematical solutions as well as
+                decimal approximations.
+            </p>
+
+            <div class="help-result-preview">
+
+                <code>Equation:
+x² - 2 = 0
+
+Mode:
+Automatic / rAIson
+
+Criterion:
+I seek an analytical solution
+
+Example symbolic result:
+x = -sqrt(2)
+x = sqrt(2)
+
+Decimal approximations:
+x ≈ -1.4142135624
+x ≈ 1.4142135624</code>
+
+            </div>
+
+            <button
+                type="button"
+                class="help-use-example"
+                style="margin-top: 10px;"
+                data-example="x² - 2 = 0"
+                data-method="automatic"
+                data-clear-criteria="true"
+                data-criterion="analyticalSolution"
+            >
+                Use Automatic Analytical Example
+            </button>
+
+
+            <h3>
+                8. rAIson Criteria Guide
+            </h3>
+
+            <p>
+                Criteria describe mathematical properties
+                of the problem or preferences for the solution.
+                More than one criterion may be selected.
+            </p>
+
+
+            <div class="help-table-wrap">
+
+                <table class="help-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>
+                                Criterion
+                            </th>
+
+                            <th>
+                                Meaning
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>
+                                I seek an analytical solution
+                            </td>
+
+                            <td>
+                                Indicates that an exact symbolic
+                                solution is preferred when appropriate.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Function is polynomial
+                            </td>
+
+                            <td>
+                                Indicates that the equation
+                                is polynomial in x.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                I seek a complex root
+                            </td>
+
+                            <td>
+                                Indicates that complex-valued
+                                roots are relevant.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Derivative is available
+                            </td>
+
+                            <td>
+                                Indicates that derivative information
+                                is available for the problem.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                I have a good initial approximation
+                            </td>
+
+                            <td>
+                                Indicates that a starting value
+                                close to the expected root is known.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Integer-valued threshold problem
+                            </td>
+
+                            <td>
+                                Indicates that the required answer
+                                is an integer threshold or integer value.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                f(a) * f(b) &lt; 0
+                            </td>
+
+                            <td>
+                                Indicates that the supplied interval
+                                contains a sign change.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Continuous extension is available
+                            </td>
+
+                            <td>
+                                Indicates that the function
+                                has a suitable continuous extension.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Length of [a,b] &gt;&gt; 1
+                            </td>
+
+                            <td>
+                                Indicates that the available
+                                search interval is relatively large.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Steep gradient or no gradient near root
+                            </td>
+
+                            <td>
+                                Describes difficult derivative behavior
+                                close to the solution.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Inflection points near solution
+                            </td>
+
+                            <td>
+                                Indicates that inflection points
+                                may occur close to the expected root.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Extremum points near solution
+                            </td>
+
+                            <td>
+                                Indicates that local extrema
+                                may occur close to the solution.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Function behaves smoothly near root
+                            </td>
+
+                            <td>
+                                Indicates regular and smooth
+                                local behavior near the root.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Known k-multiplicity of root
+                            </td>
+
+                            <td>
+                                Indicates that information
+                                about root multiplicity is known.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Function is monotonic
+                            </td>
+
+                            <td>
+                                Indicates that the function
+                                is monotonic in the relevant region.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                I need simplicity
+                            </td>
+
+                            <td>
+                                Expresses a preference
+                                for a simpler solving approach.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                I need robustness
+                            </td>
+
+                            <td>
+                                Expresses a preference
+                                for robust root-finding behavior.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                I need speed
+                            </td>
+
+                            <td>
+                                Expresses a preference
+                                for computational speed.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <h3>
+                9. Integrals, derivatives, sums and products
+            </h3>
+
+            <p>
+                The main free unknown must remain
+                <strong>x</strong>.
+                Bound variables such as
+                <strong>t</strong>
+                or
+                <strong>n</strong>
+                may be used inside definite integrals,
+                finite sums and finite products.
+            </p>
+
+            <div class="help-example-grid">
+
+                <div class="help-example">
+
+                    <strong>
+                        Integral notation
+                    </strong>
+
+                    <code>
+                        Integral(t**2, (t, 0, x)) = 9
+                    </code>
+
+                </div>
+
+                <div class="help-example">
+
+                    <strong>
+                        Alternative integral notation
+                    </strong>
+
+                    <code>
+                        integrate(t**2, (t, 0, x)) = 9
+                    </code>
+
+                </div>
+
+                <div class="help-example">
+
+                    <strong>
+                        Exponential integral expression
+                    </strong>
+
+                    <code>
+                        Integral(exp(-t**2), (t, 0, x)) = 0.5
+                    </code>
+
+                </div>
+
+                <div class="help-example">
+
+                    <strong>
+                        Derivative notation
+                    </strong>
+
+                    <code>
+                        Derivative(sin(x), x) = 0.5
+                    </code>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Finite sum
+                    </strong>
+
+                    <code>
+                        Sum(n*x, (n, 1, 5)) = 15
+                    </code>
+
+                </div>
+
+
+                <div class="help-example">
+
+                    <strong>
+                        Finite product
+                    </strong>
+
+                    <code>
+                        Product(1+x/(n+1), (n, 0, 3)) = 5
+                    </code>
+
+                </div>
+
+            </div>
+
+
+            <h3>
+                10. Important input tips
+            </h3>
+
+            <ul class="help-steps">
+
+                <li>
+                    Use parentheses when an expression
+                    could otherwise be ambiguous.
+                </li>
+
+                <li>
+                    Only one equality sign should be used
+                    in a single equation.
+                </li>
+
+                <li>
+                    The solver accepts both standard
+                    keyboard notation and several
+                    mathematical Unicode symbols.
+                </li>
+
+                <li>
+                    MATLAB scalar operators such as
+                    <code>.^</code>,
+                    <code>.*</code>
+                    and
+                    <code>./</code>
+                    are accepted.
+                </li>
+
+                <li>
+                    Scientific notation such as
+                    <code>1e-8</code>
+                    and
+                    <code>15.8e-6</code>
+                    is supported.
+                </li>
+
+                <li>
+                    For Bisection, fzero and ITP, enter a suitable interval or leave both fields empty to let ABESS attempt to find one automatically.
+                </li>
+
+                <li>
+                    Symbolic Solve may return exact expressions,
+                    while numerical methods normally return
+                    numerical approximations.
+                </li>
+
+            </ul>
+
+
+            <h3>
+                11. Current scope and limitations
+            </h3>
+
+            <div class="help-warning">
+
+                <p>
+                    The application is designed for scalar equations
+                    with one free unknown,
+                    <strong>x</strong>.
+                </p>
+
+                <p>
+                    Bound variables may appear inside constructs
+                    such as definite integrals, finite sums and finite
+                    products, but arbitrary additional free variables
+                    are not supported.
+                </p>
+
+                <p>
+                    Polynomial Roots is intended for polynomial equations.
+                    Symbolic Solve attempts to obtain an analytical result,
+                    but not every mathematical equation has a closed-form
+                    symbolic solution.
+                </p>
+
+                <p>
+                    The input field accepts several MATLAB-style
+                    mathematical operators, but it is
+                    <strong>not a MATLAB programming environment</strong>.
+                    MATLAB scripts and commands such as
+                    <code>for</code>,
+                    <code>syms</code>,
+                    <code>@(x)</code>,
+                    <code>optimset</code>
+                    or complete MATLAB functions should not be entered
+                    into the equation field.
+                </p>
+
+                <p>
+                    Systems of equations, ordinary differential equations,
+                    partial differential equations and general integral
+                    equations with an unknown function are outside
+                    the current scope.
+                </p>
+
+            </div>
+
+
+            <h3>
+                12. Quick method selection reminder
+            </h3>
+
+            <p class="help-small">
+                Manual mode means that the selected method is executed
+                directly. Automatic / rAIson mode means that rAIson
+                determines the method from the supplied criteria,
+                and Python then executes that selected method.
+            </p>
+
+
+            <h3>
+                13. Accounts, guest access and password recovery
+            </h3>
+
+            <p>
+                The application can be used either with a registered
+                account or in Guest mode.
+            </p>
+
+            <ul class="help-steps">
+
+                <li>
+                    <strong>Registered users</strong>
+                    can log in, keep their solve history,
+                    access My Information and use a personal API key.
+                </li>
+
+                <li>
+                    <strong>Guest users</strong>
+                    can perform up to
+                    <strong>3 free solves</strong>.
+                </li>
+
+                <li>
+                    New accounts must verify their email address
+                    before they can log in.
+                </li>
+
+                <li>
+                    If a password is forgotten, enter the account
+                    email address and select
+                    <strong>Forgot password?</strong>.
+                </li>
+
+                <li>
+                    A password-reset link is sent by email.
+                    The link is valid for
+                    <strong>30 minutes</strong>
+                    and can be used only once.
+                </li>
+
+                <li>
+                    Resetting the password does not create
+                    a new account. Existing history,
+                    account information, role and API key
+                    remain associated with the same user.
+                </li>
+
+            </ul>
+
+
+            <h3>
+                14. Results and solve history
+            </h3>
+
+            <p>
+                After a solve attempt, the Results area displays
+                the method that was executed and the result
+                returned by the solver.
+            </p>
+
+            <p>
+                In Automatic / rAIson mode, the result can also
+                contain the method recommended by rAIson together
+                with the explanation supplied by rAIson.
+            </p>
+
+            <div class="help-note">
+                A recommendation from rAIson selects the method.
+                The numerical or symbolic computation itself
+                is then performed by the Python backend.
+            </div>
+
+            <p>
+                Registered users can open
+                <strong>History</strong>
+                to review previous solve attempts.
+                The history includes both successful and failed
+                attempts.
+            </p>
+
+            <ul class="help-steps">
+
+                <li>
+                    <strong>Success</strong>
+                    means that the selected method returned
+                    a valid result.
+                </li>
+
+                <li>
+                    <strong>Failed</strong>
+                    means that the solve attempt could not
+                    produce a valid result.
+                </li>
+
+                <li>
+                    Failed entries include the error code
+                    and a readable error message when available.
+                </li>
+
+            </ul>
+
+
+            <h3>
+                15. My Information and API access
+            </h3>
+
+            <p>
+                Logged-in users can open
+                <strong>My Information</strong>
+                to view their account information and
+                personal API key.
+            </p>
+
+            <div class="help-warning">
+                The API key is a private credential.
+                Do not publish it, include it in screenshots,
+                commit it to source-control repositories
+                or share it with other users.
+            </div>
+
+            <p>
+                The API allows an external program or script to send equations directly to the same solver backend used by the web application. Numerical parameters such as a, b, x0, x1 and x2 are optional. When required starting values are omitted, ABESS attempts to estimate them automatically.
+            </p>
+
+            <p>
+                Solve requests are sent with an HTTP
+                <strong>POST</strong>
+                request to:
+            </p>
+
+            <div class="help-result-preview">
+                <code>https://abess.hmu.gr/api/equation/solve</code>
+            </div>
+
+            <p>
+                The personal key must be supplied in the
+                <code>X-API-Key</code>
+                request header.
+            </p>
+
+            <div class="help-result-preview">
+                <code>Content-Type: application/json
+X-API-Key: YOUR_API_KEY</code>
+            </div>
+
+            <p>
+                Example using a manually selected method:
+            </p>
+
+            <div class="help-result-preview">
+                <code>curl -X POST https://abess.hmu.gr/api/equation/solve \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -d '{
+    "equation": "x^2 - 4 = 0",
+    "method": "bisection",
+    "a": 0,
+    "b": 3,
+    "selected_elements": []
+  }'</code>
+            </div>
+
+            <p>
+                Supported manual method identifiers for API calls are:
+            </p>
+
+            <div class="help-result-preview">
+                <code>bisection
+newton
+secant
+fzero
+itp
+muller
+solve
+roots
+integer_exhaustive_scan</code>
+            </div>
+
+            <p>
+                Automatic / rAIson selection is requested by setting
+                <code>method</code>
+                to
+                <code>"automatic"</code>
+                and supplying the appropriate problem criteria
+                through
+                <code>selected_elements</code>.
+                The backend also accepts
+                <code>null</code>
+                for compatibility, but
+                <code>"automatic"</code>
+                is the recommended public API form.
+            </p>
+
+            <p>
+                For example, the criterion
+                <strong>f(a) * f(b) &lt; 0</strong>
+                can be supplied using the ABESS criterion identifier:
+            </p>
+
+            <div class="help-result-preview">
+                <code>{
+  "equation": "x^2 - 4 = 0",
+  "method": "automatic",
+  "a": 0,
+  "b": 3,
+  "selected_elements": [
+    "opposite_signs_interval"
+  ]
+}</code>
+            </div>
+
+            <p>
+                The recommended public criterion identifiers for
+                Automatic / rAIson API requests are:
+            </p>
+
+            <div class="help-result-preview">
+                <code>seek_analytical_solution
+function_is_polynomial
+seek_complex_root
+derivative_is_available
+good_initial_approximation
+integer_valued_threshold_problem
+opposite_signs_interval
+continuous_extension_available
+length_interval_large
+steep_gradient_or_no_gradient_near_root
+inflection_points_near_solution
+extremum_points_near_solution
+function_behaves_smoothly_near_root
+known_k_multiplicity_of_root
+function_is_monotonic
+need_simplicity
+need_robustness
+need_speed</code>
+            </div>
+
+            <div class="help-note">
+                The application converts these public criterion
+                identifiers to the corresponding rAIson elements
+                internally. API clients therefore do not need to know
+                or depend on rAIson OPT identifiers.
+            </div>
+
+            <div class="help-note">
+                <code>no_context</code>
+                is an internal application criterion.
+                It is added automatically when required and should
+                not be supplied by API clients.
+            </div>
+
+
+            <p>
+                API responses are returned as JSON.
+                Depending on the method and outcome,
+                the response can contain fields such as
+                <code>success</code>,
+                <code>method</code>,
+                <code>root</code>,
+                <code>iterations</code>,
+                <code>error</code>,
+                <code>message</code>,
+                <code>suggestion</code>
+                and rAIson-related information.
+            </p>
+
+            <p>
+                Authenticated API solve attempts are associated
+                with the same registered account and are recorded
+                by the application as API requests.
+            </p>
+
+            <div class="help-warning">
+                Selecting
+                <strong>Regenerate API Key</strong>
+                creates a new personal key.
+                The previous API key immediately stops
+                being valid, so any external scripts
+                using the old key must be updated.
+            </div>
+
+
+            <h3>
+                16. Understanding errors and suggestions
+            </h3>
+
+            <p>
+                When a solve attempt cannot be completed,
+                the application tries to provide a clear
+                explanation instead of exposing internal
+                technical details.
+            </p>
+
+            <p>
+                An error response may contain:
+            </p>
+
+            <ul class="help-steps">
+
+                <li>
+                    <strong>Title</strong> —
+                    a short description of the problem.
+                </li>
+
+                <li>
+                    <strong>Message</strong> —
+                    an explanation of what prevented
+                    the solve from succeeding.
+                </li>
+
+                <li>
+                    <strong>Suggestion</strong> —
+                    a recommended change to the equation,
+                    interval, starting values, method
+                    or criteria.
+                </li>
+
+            </ul>
+
+            <p>
+                Common causes include an unsuitable interval,
+                invalid starting values, a function that is
+                undefined for required values, an equation that
+                does not match the selected method, or failure
+                of a numerical method to converge.
+            </p>
+
+            <div class="help-note">
+                When Automatic / rAIson is used,
+                the rAIson recommendation and its explanation
+                are separate from the solver error message.
+                A valid method recommendation does not guarantee
+                that every numerical input supplied to that
+                method will produce a successful solve.
+            </div>
+
+
+            <h3>
+                17. Before reporting a problem
+            </h3>
+
+            <ul class="help-steps">
+
+                <li>
+                    Check that the equation contains only
+                    the supported free unknown
+                    <strong>x</strong>.
+                </li>
+
+                <li>
+                    Check parentheses, powers and function syntax.
+                </li>
+
+                <li>
+                    For interval methods, review
+                    <code>a</code>
+                    and
+                    <code>b</code>.
+                </li>
+
+                <li>
+                    For Newton-Raphson, Secant and Muller, review any starting values you supplied. If automatic estimation fails, try entering suitable values manually.
+                </li>
+
+                <li>
+                    If using Automatic / rAIson,
+                    verify that the selected criteria
+                    correctly describe the problem.
+                </li>
+
+                <li>
+                    If an API request fails,
+                    verify the endpoint,
+                    <code>Content-Type</code>
+                    and
+                    <code>X-API-Key</code>
+                    header.
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script
+    src="https://cdn.plot.ly/plotly-2.35.2.min.js"
+></script>
+
+<script
+    src="./assets/js/auth.js?v=20261005-manual1"
+></script>
+
+<script
+    src="./assets/js/solve.js?v=20261017132411"
+></script>
+
+
+<script>
+    (function () {
+
+        const helpButton =
+            document.getElementById(
+                "helpButton"
+            );
+
+        const helpModal =
+            document.getElementById(
+                "helpModal"
+            );
+
+        const closeHelpButton =
+            document.getElementById(
+                "closeHelpButton"
+            );
+
+        const equationInput =
+            document.getElementById(
+                "equation"
+            );
+
+        const methodSelect =
+            document.getElementById(
+                "method"
+            );
+
+        const aValue =
+            document.getElementById(
+                "aValue"
+            );
+
+        const bValue =
+            document.getElementById(
+                "bValue"
+            );
+
+        const x0Value =
+            document.getElementById(
+                "x0Value"
+            );
+
+        const x1Value =
+            document.getElementById(
+                "x1Value"
+            );
+
+
+        if (
+            !helpButton
+            || !helpModal
+            || !closeHelpButton
+        ) {
+            return;
+        }
+
+
+        function openHelp() {
+
+            const guestHelpNotice =
+                document.getElementById(
+                    "guestHelpNotice"
+                );
+
+            if (guestHelpNotice) {
+
+                const isGuest =
+                    localStorage.getItem(
+                        "access_mode"
+                    ) === "guest";
+
+                guestHelpNotice.classList.toggle(
+                    "hidden",
+                    !isGuest
+                );
+            }
+
+            helpModal.classList.remove(
+                "hidden"
+            );
+
+            document.body.classList.add(
+                "help-modal-open"
+            );
+
+            closeHelpButton.focus();
+        }
+
+
+        function closeHelp() {
+
+            helpModal.classList.add(
+                "hidden"
+            );
+
+            document.body.classList.remove(
+                "help-modal-open"
+            );
+        }
+
+
+        function dispatchInput(
+            element
+        ) {
+
+            if (!element) {
+                return;
+            }
+
+            element.dispatchEvent(
+                new Event(
+                    "input",
+                    {
+                        bubbles: true
+                    }
+                )
+            );
+        }
+
+
+        function clearNumericalValues() {
+
+            if (aValue) {
+                aValue.value = "";
+                dispatchInput(aValue);
+            }
+
+            if (bValue) {
+                bValue.value = "";
+                dispatchInput(bValue);
+            }
+
+            if (x0Value) {
+                x0Value.value = "";
+            }
+
+            if (x1Value) {
+                x1Value.value = "";
+            }
+        }
+
+
+        function clearCriteria() {
+
+            const criteria =
+                document.querySelectorAll(
+                    '#criteriaMenu input[type="checkbox"]'
+                );
+
+            criteria.forEach(
+                checkbox => {
+
+                    checkbox.checked =
+                        false;
+
+                    checkbox.dispatchEvent(
+                        new Event(
+                            "change",
+                            {
+                                bubbles: true
+                            }
+                        )
+                    );
+
+                }
+            );
+        }
+
+
+        function applyExample(
+            button
+        ) {
+
+            const example =
+                button.dataset.example;
+
+            const method =
+                button.dataset.method;
+
+            const criterion =
+                button.dataset.criterion;
+
+            const shouldClearCriteria =
+                button.dataset.clearCriteria
+                === "true";
+
+
+            clearNumericalValues();
+
+
+            if (
+                equationInput
+                && example
+            ) {
+
+                equationInput.value =
+                    example;
+
+                equationInput.dispatchEvent(
+                    new Event(
+                        "input",
+                        {
+                            bubbles: true
+                        }
+                    )
+                );
+            }
+
+
+            if (
+                methodSelect
+                && method
+            ) {
+
+                methodSelect.value =
+                    method;
+
+                methodSelect.dispatchEvent(
+                    new Event(
+                        "change",
+                        {
+                            bubbles: true
+                        }
+                    )
+                );
+            }
+
+
+            if (
+                button.dataset.a !== undefined
+                && aValue
+            ) {
+
+                aValue.value =
+                    button.dataset.a;
+
+                dispatchInput(
+                    aValue
+                );
+            }
+
+
+            if (
+                button.dataset.b !== undefined
+                && bValue
+            ) {
+
+                bValue.value =
+                    button.dataset.b;
+
+                dispatchInput(
+                    bValue
+                );
+            }
+
+
+            if (
+                button.dataset.x0 !== undefined
+                && x0Value
+            ) {
+
+                x0Value.value =
+                    button.dataset.x0;
+            }
+
+
+            if (
+                button.dataset.x1 !== undefined
+                && x1Value
+            ) {
+
+                x1Value.value =
+                    button.dataset.x1;
+            }
+
+
+            if (
+                shouldClearCriteria
+            ) {
+
+                clearCriteria();
+            }
+
+
+            if (criterion) {
+
+                const criterionElement =
+                    document.getElementById(
+                        criterion
+                    );
+
+                if (criterionElement) {
+
+                    criterionElement.checked =
+                        true;
+
+                    criterionElement.dispatchEvent(
+                        new Event(
+                            "change",
+                            {
+                                bubbles: true
+                            }
+                        )
+                    );
+                }
+            }
+
+
+            closeHelp();
+
+
+            if (equationInput) {
+
+                equationInput.focus();
+
+                equationInput.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }
+        }
+
+
+        helpButton.addEventListener(
+            "click",
+            openHelp
+        );
+
+
+        closeHelpButton.addEventListener(
+            "click",
+            function () {
+
+                closeHelp();
+
+                helpButton.focus();
+            }
+        );
+
+
+        helpModal.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target
+                    === helpModal
+                ) {
+
+                    closeHelp();
+
+                    helpButton.focus();
+                }
+            }
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key
+                    === "Escape"
+                    && !helpModal.classList.contains(
+                        "hidden"
+                    )
+                ) {
+
+                    closeHelp();
+
+                    helpButton.focus();
+                }
+            }
+        );
+
+
+        const exampleButtons =
+            document.querySelectorAll(
+                ".help-use-example"
+            );
+
+
+        exampleButtons.forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        applyExample(
+                            button
+                        );
+                    }
+                );
+            }
+        );
+
+    })();
+</script>
+
+</body>
+</html>
